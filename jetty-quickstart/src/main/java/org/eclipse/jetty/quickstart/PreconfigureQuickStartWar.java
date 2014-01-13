@@ -126,7 +126,7 @@ public class PreconfigureQuickStartWar
         
         for (String p:webapp.getInitParams().keySet())
             out
-            .open("context-param")
+            .open("context-param",origin(md,"context-param."+p))
             .tag("param-name",p)
             .tag("param-value",webapp.getInitParameter(p))
             .close();
@@ -134,7 +134,7 @@ public class PreconfigureQuickStartWar
         if (webapp.getEventListeners()!=null)
             for (EventListener e : webapp.getEventListeners())
                 out
-                .open("listener")
+                .open("listener",origin(md,e.getClass().getCanonicalName()+".listener"))
                 .tag("listener-class",e.getClass().getCanonicalName())
                 .close();
         
@@ -176,7 +176,7 @@ public class PreconfigureQuickStartWar
 
         for (ServletMapping mapping : servlets.getServletMappings())
         {
-            out.open("servlet-mapping");
+            out.open("servlet-mapping",origin(md,mapping.getServletName()+".servlet.mappings"));
             out.tag("servlet-name",mapping.getServletName());
             if (mapping.getPathSpecs()!=null)
                 for (String s:mapping.getPathSpecs())
@@ -216,10 +216,10 @@ public class PreconfigureQuickStartWar
                 out.tag("load-on-startup",Integer.toString(s.getInitOrder()));
             
             if (s.getRunAsRole()!=null)
-                out.open("run-as").tag("role-name",s.getRunAsRole()).close();
+                out.open("run-as",origin(md,ot+"run-as")).tag("role-name",s.getRunAsRole()).close();
             
             if (!s.isEnabled())
-                out.tag("enabled","false");
+                out.tag("enabled",origin(md,ot+"enabled"),"false");
             
             // TODO security-role-ref
             // TODO multipart-config
