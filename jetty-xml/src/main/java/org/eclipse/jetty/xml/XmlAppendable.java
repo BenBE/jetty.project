@@ -156,4 +156,8 @@ public class XmlAppendable
         }
     }
     
+    public Stack<String> getOpenTags()
+    {
+        return (Stack<String>)_tags.clone();
+    }
 }

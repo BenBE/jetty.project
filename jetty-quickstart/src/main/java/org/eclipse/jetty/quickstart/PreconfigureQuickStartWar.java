@@ -39,6 +39,8 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlet.ServletMapping;
 import org.eclipse.jetty.util.resource.JarResource;
 import org.eclipse.jetty.util.resource.Resource;
+import org.eclipse.jetty.webapp.MetaData;
+import org.eclipse.jetty.webapp.Origin;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.xml.XmlAppendable;
 
@@ -108,6 +110,7 @@ public class PreconfigureQuickStartWar
     private static void quickstartWebXml(WebAppContext webapp,File webxml) throws IOException
     {
         XmlAppendable out = new XmlAppendable(new PrintStream(webxml));
+        MetaData md = webapp.getMetaData();
         
         Map<String,String> webappAttr = new HashMap<>();
         webappAttr.put("xmlns","http://xmlns.jcp.org/xml/ns/javaee"); 
@@ -139,7 +142,7 @@ public class PreconfigureQuickStartWar
         
         
         for (FilterHolder holder : servlets.getFilters())
-            outholder(out,"filter",holder);
+            outholder(out,md,"filter",holder);
         
         for (FilterMapping mapping : servlets.getFilterMappings())
         {
@@ -169,7 +172,7 @@ public class PreconfigureQuickStartWar
         }
 
         for (ServletHolder holder : servlets.getServlets())
-            outholder(out,"filter",holder);
+            outholder(out,md,"servlet",holder);
 
         for (ServletMapping mapping : servlets.getServletMappings())
         {
@@ -184,16 +187,21 @@ public class PreconfigureQuickStartWar
         out.close();
     }
 
-    private static void outholder(XmlAppendable out, String tag, Holder<?> holder)
+    private static void outholder(XmlAppendable out, MetaData md, String tag, Holder<?> holder)
     throws IOException
     {
         out.open(tag, Collections.singletonMap("source",holder.getSource().toString()));
-        out.tag(tag+"-name",holder.getName());
-        out.tag(tag+"-class",holder.getClassName());
+        String n=holder.getName();
+        out.tag(tag+"-name",n);
+        
+        String ot=n+"."+tag+".";
+        
+        out.tag(tag+"-class",origin(md,ot+tag+"-class"),holder.getClassName());
+        
 
         for (String p:holder.getInitParameters().keySet())
             out
-            .open("init-param")
+            .open("init-param",origin(md,ot+"init-param."+p))
             .tag("param-name",p)
             .tag("param-value",holder.getInitParameter(p))
             .close();
@@ -217,7 +225,17 @@ public class PreconfigureQuickStartWar
             // TODO multipart-config
         }
      
-        out.tag("async-supported",holder.isAsyncSupported()?"true":"false");
+        out.tag("async-supported",origin(md,ot+"async-supported"),holder.isAsyncSupported()?"true":"false");
         out.close();
+    }
+    
+    public static Map<String,String> origin(MetaData md,String name)
+    {
+        Origin origin=md.getOrigin(name);
+        // System.err.println("origin of "+name+" is "+origin);
+        if (name==null || origin==Origin.NotSet)
+            return Collections.emptyMap();
+        return Collections.singletonMap("origin",origin.toString());
+        
     }
 }
