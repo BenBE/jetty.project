@@ -14,17 +14,6 @@ public class RunBenchmarkWar
     private static final long __start=System.nanoTime();
     private static final Logger LOG = Log.getLogger(Server.class);
     
-    public static final String[] __plusConfigurationClasses = new String[] 
-    {
-        org.eclipse.jetty.webapp.WebInfConfiguration.class.getCanonicalName(),
-        org.eclipse.jetty.webapp.WebXmlConfiguration.class.getCanonicalName(),
-        org.eclipse.jetty.webapp.MetaInfConfiguration.class.getCanonicalName(),
-        org.eclipse.jetty.webapp.FragmentConfiguration.class.getCanonicalName(),
-        org.eclipse.jetty.plus.webapp.EnvConfiguration.class.getCanonicalName(),
-        org.eclipse.jetty.plus.webapp.PlusConfiguration.class.getCanonicalName(),
-        org.eclipse.jetty.annotations.AnnotationConfiguration.class.getCanonicalName(),
-        org.eclipse.jetty.webapp.JettyWebXmlConfiguration.class.getCanonicalName()
-    };
     
     public static void main(String... args) throws Exception
     {   
@@ -35,7 +24,7 @@ public class RunBenchmarkWar
         server.addBean(mbContainer);
 
         WebAppContext webapp = new WebAppContext();
-        webapp.setConfigurationClasses(__plusConfigurationClasses);
+        webapp.setConfigurationClasses(PreconfigureQuickStartWar.__configurationClasses);
         webapp.setContextPath("/");
         webapp.setWar("src/test/resources/benchmark-java-webapp-1.0.war");
 
