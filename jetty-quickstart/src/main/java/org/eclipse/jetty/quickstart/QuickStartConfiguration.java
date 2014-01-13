@@ -91,9 +91,10 @@ public class QuickStartConfiguration extends AbstractConfiguration
     @Override
     public void configure(WebAppContext context) throws Exception
     {
+        LOG.debug("configure {}",this);
         if (context.isStarted())
         {
-            LOG.debug("Cannot configure webapp after it is started");
+            LOG.warn("Cannot configure webapp after it is started");
             return;
         }
         
@@ -129,6 +130,9 @@ public class QuickStartConfiguration extends AbstractConfiguration
         starter = new ServletContainerInitializersStarter(context);
         context.setAttribute(AnnotationConfiguration.CONTAINER_INITIALIZER_STARTER, starter);
         context.addBean(starter, true); 
+        
+
+        LOG.debug("configured {}",this);
     }
 
 }

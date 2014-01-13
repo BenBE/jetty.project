@@ -1,10 +1,7 @@
 package org.eclipse.jetty.quickstart;
 
-import java.lang.management.ManagementFactory;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
@@ -25,18 +22,16 @@ public class QuickStartBenchmarkWar
     
     public static void main(String... args) throws Exception
     {   
+        // Log.getRootLogger().setDebugEnabled(true);
+        
         Server server = new Server(8080);
         
-        // Setup JMX
-        MBeanContainer mbContainer=new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
-        server.addBean(mbContainer);
-
         WebAppContext webapp = new WebAppContext();
         webapp.setConfigurationClasses(__configurationClasses);
         webapp.setContextPath("/");
         webapp.setWar("target/preconfigured");
         server.setHandler(webapp);
-
+        
         server.start();
 
         LOG.info("Started in {}ms",TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-__start));

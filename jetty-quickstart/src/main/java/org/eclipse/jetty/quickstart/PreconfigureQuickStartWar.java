@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URLClassLoader;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EventListener;
 import java.util.HashMap;
@@ -86,6 +88,8 @@ public class PreconfigureQuickStartWar
                 getMetaData().resolve(this);
                 
                 quickstartWebXml(this,new File(getWebInf().getFile(),"quickstart-web.xml"));
+                
+                System.err.println(Arrays.asList(((URLClassLoader)getClassLoader()).getURLs()));
             }
         };
         
