@@ -27,23 +27,23 @@ import org.eclipse.jetty.util.IO;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
-public class PreconfigureBenchmarkWar
+public class PreconfigureJNDIWar
 {
     private static final long __start=System.nanoTime();
     private static final Logger LOG = Log.getLogger(Server.class);
     
     public static void main(String[] args) throws Exception
     {
-        String target="target/benchmark-preconfigured";
+        String target="target/test-jndi-preconfigured";
         File file = new File(target);
         if (file.exists())
             IO.delete(file);
         
-        PreconfigureQuickStartWar.main("src/test/resources/benchmark-java-webapp-1.0.war",target);
+        PreconfigureQuickStartWar.main("target/test-jndi.war",target);
 
         LOG.info("Preconfigured in {}ms",TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-__start));
         
-        IO.copy(new FileInputStream("target/benchmark-preconfigured/WEB-INF/quickstart-web.xml"),System.out);
+        IO.copy(new FileInputStream("target/test-jndi-preconfigured/WEB-INF/quickstart-web.xml"),System.out);
     }
 
 }

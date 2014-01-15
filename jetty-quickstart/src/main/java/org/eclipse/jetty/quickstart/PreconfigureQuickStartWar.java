@@ -145,48 +145,60 @@ public class PreconfigureQuickStartWar
         ServletHandler servlets = webapp.getServletHandler();
         
         
-        for (FilterHolder holder : servlets.getFilters())
-            outholder(out,md,"filter",holder);
+	if (servlets.getFilters()!=null)
+	{
+	    for (FilterHolder holder : servlets.getFilters())
+		outholder(out,md,"filter",holder);
+	}
         
-        for (FilterMapping mapping : servlets.getFilterMappings())
-        {
-            out.open("filter-mapping");
-            out.tag("filter-name",mapping.getFilterName());
-            if (mapping.getPathSpecs()!=null)
-                for (String s:mapping.getPathSpecs())
-                    out.tag("url-pattern",s);
-            if (mapping.getServletNames()!=null)
-                for (String n:mapping.getServletNames())
-                    out.tag("servlet-name",n);
-            
-            if (!mapping.isDefaultDispatches())
-            {
-                if (mapping.appliesTo(DispatcherType.REQUEST))
-                    out.tag("dispatcher","REQUEST");
-                if (mapping.appliesTo(DispatcherType.ASYNC))
-                    out.tag("dispatcher","ASYNC");
-                if (mapping.appliesTo(DispatcherType.ERROR))
-                    out.tag("dispatcher","ERROR");
-                if (mapping.appliesTo(DispatcherType.FORWARD))
-                    out.tag("dispatcher","FORWARD");
-                if (mapping.appliesTo(DispatcherType.INCLUDE))
-                    out.tag("dispatcher","INCLUDE");
-            }
-            out.close();
-        }
+	if (servlets.getFilterMappings()!=null)
+	{
+	    for (FilterMapping mapping : servlets.getFilterMappings())
+	    {
+		out.open("filter-mapping");
+		out.tag("filter-name",mapping.getFilterName());
+		if (mapping.getPathSpecs()!=null)
+		    for (String s:mapping.getPathSpecs())
+			out.tag("url-pattern",s);
+		if (mapping.getServletNames()!=null)
+		    for (String n:mapping.getServletNames())
+			out.tag("servlet-name",n);
+		
+		if (!mapping.isDefaultDispatches())
+		{
+		    if (mapping.appliesTo(DispatcherType.REQUEST))
+			out.tag("dispatcher","REQUEST");
+		    if (mapping.appliesTo(DispatcherType.ASYNC))
+			out.tag("dispatcher","ASYNC");
+		    if (mapping.appliesTo(DispatcherType.ERROR))
+			out.tag("dispatcher","ERROR");
+		    if (mapping.appliesTo(DispatcherType.FORWARD))
+			out.tag("dispatcher","FORWARD");
+		    if (mapping.appliesTo(DispatcherType.INCLUDE))
+			out.tag("dispatcher","INCLUDE");
+		}
+		out.close();
+	    }
+	}
 
-        for (ServletHolder holder : servlets.getServlets())
-            outholder(out,md,"servlet",holder);
+        if (servlets.getServlets()!=null)
+	{
+	    for (ServletHolder holder : servlets.getServlets())
+		outholder(out,md,"servlet",holder);
+	}
 
-        for (ServletMapping mapping : servlets.getServletMappings())
-        {
-            out.open("servlet-mapping",origin(md,mapping.getServletName()+".servlet.mappings"));
-            out.tag("servlet-name",mapping.getServletName());
-            if (mapping.getPathSpecs()!=null)
-                for (String s:mapping.getPathSpecs())
-                    out.tag("url-pattern",s);
-            out.close();
-        }
+        if (servlets.getServletMappings()!=null)
+	{
+	    for (ServletMapping mapping : servlets.getServletMappings())
+	    {
+		out.open("servlet-mapping",origin(md,mapping.getServletName()+".servlet.mappings"));
+		out.tag("servlet-name",mapping.getServletName());
+		if (mapping.getPathSpecs()!=null)
+		    for (String s:mapping.getPathSpecs())
+			out.tag("url-pattern",s);
+		out.close();
+	    }
+	}
         
         out.close();
     }

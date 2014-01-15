@@ -48,4 +48,44 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.eclipse.jetty.tests</groupId>
+                  <artifactId>test-jndi-webapp</artifactId>
+                  <version>${project.version}</version>
+                  <type>war</type>
+                  <overWrite>true</overWrite>
+                  <includes>**</includes>
+                  <outputDirectory>${basedir}/target</outputDirectory>
+                  <destFileName>test-jndi.war</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.eclipse.jetty.tests</groupId>
+                  <artifactId>test-spec-webapp</artifactId>
+                  <version>${project.version}</version>
+                  <type>war</type>
+                  <overWrite>true</overWrite>
+                  <includes>**</includes>
+                  <outputDirectory>${basedir}/target</outputDirectory>
+                  <destFileName>test-spec.war</destFileName>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+	</executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

@@ -25,7 +25,7 @@ import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 import org.eclipse.jetty.webapp.WebAppContext;
 
-public class QuickStartBenchmarkWar 
+public class QuickStartJNDIWar 
 {
     private static final long __start=System.nanoTime();
     private static final Logger LOG = Log.getLogger(Server.class);
@@ -47,7 +47,7 @@ public class QuickStartBenchmarkWar
         WebAppContext webapp = new WebAppContext();
         webapp.setConfigurationClasses(__configurationClasses);
         webapp.setContextPath("/");
-        webapp.setWar("target/benchmark-preconfigured");
+        webapp.setWar("target/test-jndi-preconfigured");
         server.setHandler(webapp);
 
         long serverStart = System.nanoTime();
