@@ -52,7 +52,7 @@ public class QuickStartTestJNDIWar
         WebAppContext webapp = new WebAppContext();
         webapp.setConfigurationClasses(__configurationClasses);
         webapp.setContextPath("/");
-        webapp.setWar("src/test/resources/test-jndi");
+        webapp.setWar("target/test-jndi-preconfigured");
         
         
         org.eclipse.jetty.plus.jndi.Transaction txmgr = new org.eclipse.jetty.plus.jndi.Transaction(new com.acme.MockUserTransaction());
