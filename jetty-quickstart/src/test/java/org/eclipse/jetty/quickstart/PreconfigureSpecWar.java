@@ -26,6 +26,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.IO;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
+import org.eclipse.jetty.util.resource.Resource;
 
 public class PreconfigureSpecWar
 {
@@ -38,6 +39,14 @@ public class PreconfigureSpecWar
         File file = new File(target);
         if (file.exists())
             IO.delete(file);
+        
+        File realmPropertiesDest = new File ("target/realm.properties");
+        if (realmPropertiesDest.exists())
+            IO.delete(realmPropertiesDest);
+        
+        Resource realmPropertiesSrc = Resource.newResource("src/test/resources/realm.properties");
+        realmPropertiesSrc.copyTo(realmPropertiesDest);
+        System.setProperty("jetty.home", "target");
         
         PreconfigureQuickStartWar.main("target/test-spec.war",target, "src/test/resources/test-spec.xml");
 

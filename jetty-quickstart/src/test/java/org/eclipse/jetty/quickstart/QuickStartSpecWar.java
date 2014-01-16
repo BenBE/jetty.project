@@ -31,6 +31,7 @@ public class QuickStartSpecWar
     public static void main(String... args) throws Exception
     {   
         // Log.getRootLogger().setDebugEnabled(true);
+       System.setProperty("jetty.home", "target");
        QuickStartWar.main("target/test-spec-preconfigured", "src/test/resources/test-spec.xml");
     }
 }
