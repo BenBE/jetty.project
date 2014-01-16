@@ -30,6 +30,7 @@ import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.ServletContainerInitializer;
@@ -133,6 +134,11 @@ public class PreconfigureQuickStartWar
     private static void quickstartWebXml(WebAppContext webapp,File webxml) throws IOException
     {
     	// webapp.dumpStdErr();
+
+    	Map<String,Set<String>> classMap = (Map<String, Set<String>>) webapp.getAttribute(AnnotationConfiguration.CLASS_INHERITANCE_MAP);
+    	for (Map.Entry<String, Set<String>> e : classMap.entrySet() )
+    		System.err.println(e);
+    	
     	
         XmlAppendable out = new XmlAppendable(new PrintStream(webxml));
         MetaData md = webapp.getMetaData();

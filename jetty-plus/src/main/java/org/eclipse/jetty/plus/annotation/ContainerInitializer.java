@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -154,4 +155,57 @@ public class ContainerInitializer
     		interested.add(c.getName());
     	return String.format("ContainerInitializer{%s,interested=%s,applicable=%s,annotated=%s}",_target.getClass().getName(),interested,_applicableTypeNames,_annotatedTypeNames);
     }
+
+	public void resolveClasses(WebAppContext context, Map<String, Set<String>> classMap) 
+	{
+        //We have already found the classes that directly have an annotation that was in the HandlesTypes
+        //annotation of the ServletContainerInitializer. For each of those classes, walk the inheritance
+        //hierarchy to find classes that extend or implement them.
+        Set<String> annotatedClassNames = getAnnotatedTypeNames();
+        if (annotatedClassNames != null && !annotatedClassNames.isEmpty())
+        {
+            for (String name : annotatedClassNames)
+            {
+                //add the class that has the annotation
+                addApplicableTypeName(name);
+
+                //find and add the classes that inherit the annotation               
+                addInheritedTypes(classMap, (Set<String>)classMap.get(name));
+            }
+        }
+        
+
+        //Now we need to look at the HandlesTypes classes that were not annotations. We need to
+        //find all classes that extend or implement them.
+        if (getInterestedTypes() != null)
+        {
+            for (Class<?> c : getInterestedTypes())
+            {
+                if (!c.isAnnotation())
+                {
+                    //find and add the classes that implement or extend the class.
+                    //but not including the class itself
+                	System.err.println(c.getName());
+                	for (Map.Entry<String, Set<String>> e : classMap.entrySet() )
+                		System.err.println(e);
+                    addInheritedTypes(classMap, (Set<String>)classMap.get(c.getName()));
+                }
+            }
+        }
+	}
+	
+	private void addInheritedTypes(Map<String, Set<String>> classMap,Set<String> names)
+	{
+        if (names == null || names.isEmpty())
+            return;
+     
+        for (String s : names)
+        {
+            //add the name of the class
+            addApplicableTypeName(s);
+
+            //walk the hierarchy and find all types that extend or implement the class
+            addInheritedTypes(classMap, (Set<String>)classMap.get(s));
+        }
+	}
 }
