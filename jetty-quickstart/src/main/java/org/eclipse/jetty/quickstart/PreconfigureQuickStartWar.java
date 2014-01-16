@@ -28,10 +28,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EventListener;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.DispatcherType;
+import javax.servlet.ServletContainerInitializer;
 
+import org.eclipse.jetty.annotations.AnnotationConfiguration;
+import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
+import org.eclipse.jetty.plus.annotation.ContainerInitializer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.FilterMapping;
@@ -98,8 +103,6 @@ public class PreconfigureQuickStartWar
                 getMetaData().resolve(this);
                 
                 quickstartWebXml(this,new File(getWebInf().getFile(),"quickstart-web.xml"));
-                
-                System.err.println(Arrays.asList(((URLClassLoader)getClassLoader()).getURLs()));
             }
         };
         
@@ -128,6 +131,8 @@ public class PreconfigureQuickStartWar
     
     private static void quickstartWebXml(WebAppContext webapp,File webxml) throws IOException
     {
+    	// webapp.dumpStdErr();
+    	
         XmlAppendable out = new XmlAppendable(new PrintStream(webxml));
         MetaData md = webapp.getMetaData();
         
@@ -142,6 +147,20 @@ public class PreconfigureQuickStartWar
         
         if (webapp.getDisplayName()!=null)
             out.tag("display-name",webapp.getDisplayName());
+        
+        List<ContainerInitializer> initializers = (List<ContainerInitializer>)webapp.getAttribute(AnnotationConfiguration.CONTAINER_INITIALIZERS);
+        if (initializers!=null && !initializers.isEmpty())
+        {
+        	int i=0;
+        	for (ContainerInitializer ci : initializers)
+        	{
+        		out
+        		.open("context-param")
+        		.tag("param-name",AnnotationConfiguration.CONTAINER_INITIALIZERS+"."+i++)
+        		.tag("param-value",ci.toString())
+        		.close();
+        	}
+        }
         
         for (String p:webapp.getInitParams().keySet())
             out
