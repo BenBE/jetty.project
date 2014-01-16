@@ -18,46 +18,19 @@
 
 package org.eclipse.jetty.quickstart;
 
-import java.util.concurrent.TimeUnit;
-
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
-import org.eclipse.jetty.webapp.WebAppContext;
 
 public class QuickStartSpecWar 
 {
-    private static final long __start=System.nanoTime();
     private static final Logger LOG = Log.getLogger(Server.class);
     
-    public static final String[] __configurationClasses = new String[] 
-            {
-                org.eclipse.jetty.quickstart.QuickStartConfiguration.class.getCanonicalName(),
-                org.eclipse.jetty.plus.webapp.EnvConfiguration.class.getCanonicalName(),
-                org.eclipse.jetty.plus.webapp.PlusConfiguration.class.getCanonicalName(),
-                org.eclipse.jetty.webapp.JettyWebXmlConfiguration.class.getCanonicalName()
-            };
+   
     
     public static void main(String... args) throws Exception
     {   
         // Log.getRootLogger().setDebugEnabled(true);
-        
-        Server server = new Server(8080);
-        
-        WebAppContext webapp = new WebAppContext();
-        webapp.setConfigurationClasses(__configurationClasses);
-        webapp.setContextPath("/");
-        webapp.setWar("target/test-spec-preconfigured");
-        server.setHandler(webapp);
-
-        long serverStart = System.nanoTime();
-        server.start();
-
-        long end = System.nanoTime();
-        
-        System.err.println("Server start in "+ TimeUnit.NANOSECONDS.toMillis(end-serverStart));
-        System.err.println("Started in "+TimeUnit.NANOSECONDS.toMillis(end-__start));
-      
-        server.join();
+       QuickStartWar.main("target/test-spec-preconfigured", "src/test/resources/test-spec.xml");
     }
 }

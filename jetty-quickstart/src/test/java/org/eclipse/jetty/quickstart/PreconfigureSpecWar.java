@@ -39,7 +39,7 @@ public class PreconfigureSpecWar
         if (file.exists())
             IO.delete(file);
         
-        PreconfigureQuickStartWar.main("target/test-spec.war",target);
+        PreconfigureQuickStartWar.main("target/test-spec.war",target, "src/test/resources/test-spec.xml");
 
         LOG.info("Preconfigured in {}ms",TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-__start));
         

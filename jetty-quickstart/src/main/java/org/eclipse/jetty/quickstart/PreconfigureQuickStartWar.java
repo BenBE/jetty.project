@@ -45,6 +45,7 @@ import org.eclipse.jetty.webapp.MetaData;
 import org.eclipse.jetty.webapp.Origin;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.xml.XmlAppendable;
+import org.eclipse.jetty.xml.XmlConfiguration;
 
 public class PreconfigureQuickStartWar
 {
@@ -65,15 +66,24 @@ public class PreconfigureQuickStartWar
         if (args.length<1)
             error("No WAR file or directory given");
         Resource war = Resource.newResource(args[0]);
-        if (!war.isDirectory() || args.length==2)
+        
+        Resource contextXml = null;
+        
+        if (args.length >= 2)
         {
-            if (args.length<2)
-                error("No target WAR directory given");
-            Resource dir = Resource.newResource(args[1]);
-            if (!dir.exists())
-                dir.getFile().mkdirs();
-            JarResource.newJarResource(war).copyTo(dir.getFile());
-            war=dir;
+            if (args[1].endsWith(".xml"))
+                contextXml = Resource.newResource(args[1]);
+            else
+            {
+                Resource dir = Resource.newResource(args[1]);
+                if (!dir.exists())
+                    dir.getFile().mkdirs();
+                JarResource.newJarResource(war).copyTo(dir.getFile());
+                war=dir;
+                
+                if (args.length == 3 && args[2].endsWith(".xml"))
+                 contextXml = Resource.newResource(args[2]);
+            }
         }
         
         final Server server = new Server();
@@ -97,6 +107,11 @@ public class PreconfigureQuickStartWar
         webapp.setContextPath("/");
         webapp.setWar(war.getFile().getAbsolutePath());
 
+        if (contextXml != null)
+        {
+            XmlConfiguration xmlConfiguration = new XmlConfiguration(contextXml.getURL());  
+            xmlConfiguration.configure(webapp);   
+        }
         server.setHandler(webapp);
 
         server.start();
@@ -106,8 +121,8 @@ public class PreconfigureQuickStartWar
     private static void error(String message)
     {
         System.err.println("ERROR: "+message);
-        System.err.println("Usage: java -jar PreconfigureQuickStartWar.jar <war-directory>");
-        System.err.println("       java -jar PreconfigureQuickStartWar.jar <war-file> <target-war-directory>");
+        System.err.println("Usage: java -jar PreconfigureQuickStartWar.jar <war-directory> <context-xml-file>");
+        System.err.println("       java -jar PreconfigureQuickStartWar.jar <war-file> <target-war-directory> <context-xml-file>");
         System.exit(1);
     }
     

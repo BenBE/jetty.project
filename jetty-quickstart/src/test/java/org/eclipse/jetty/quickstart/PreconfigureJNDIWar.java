@@ -39,7 +39,7 @@ public class PreconfigureJNDIWar
         if (file.exists())
             IO.delete(file);
         
-        PreconfigureQuickStartWar.main("target/test-jndi.war",target);
+        PreconfigureQuickStartWar.main("target/test-jndi.war",target, "src/test/resources/test-jndi.xml");
 
         LOG.info("Preconfigured in {}ms",TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-__start));
         
