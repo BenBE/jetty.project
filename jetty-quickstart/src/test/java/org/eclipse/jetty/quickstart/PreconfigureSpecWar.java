@@ -40,7 +40,7 @@ public class PreconfigureSpecWar
         if (file.exists())
             IO.delete(file);
         
-        File realmPropertiesDest = new File ("target/realm.properties");
+        File realmPropertiesDest = new File ("target/test-spec-realm.properties");
         if (realmPropertiesDest.exists())
             IO.delete(realmPropertiesDest);
         

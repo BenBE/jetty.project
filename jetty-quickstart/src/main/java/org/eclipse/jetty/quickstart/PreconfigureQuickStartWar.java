@@ -33,6 +33,7 @@ import java.util.Map;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.ServletContainerInitializer;
+import javax.servlet.ServletContext;
 
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
@@ -147,6 +148,21 @@ public class PreconfigureQuickStartWar
         
         if (webapp.getDisplayName()!=null)
             out.tag("display-name",webapp.getDisplayName());
+        
+        // Set some special context parameters
+		
+        // The location of the war file on disk
+        out.open("context-param")
+		.tag("param-name","org.eclipse.jetty.quickstart.baseResource")
+		.tag("param-value",webapp.getBaseResource().getFile().getCanonicalFile().getAbsoluteFile().toURI().toString())
+		.close();
+        
+        // The library order
+        out.open("context-param")
+		.tag("param-name",ServletContext.ORDERED_LIBS)
+		.tag("param-value",webapp.getAttribute(ServletContext.ORDERED_LIBS).toString())
+		.close();
+        
         
         List<ContainerInitializer> initializers = (List<ContainerInitializer>)webapp.getAttribute(AnnotationConfiguration.CONTAINER_INITIALIZERS);
         if (initializers!=null && !initializers.isEmpty())
