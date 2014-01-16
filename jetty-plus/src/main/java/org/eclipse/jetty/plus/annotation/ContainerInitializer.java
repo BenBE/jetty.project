@@ -156,8 +156,8 @@ public class ContainerInitializer
     	return String.format("ContainerInitializer{%s,interested=%s,applicable=%s,annotated=%s}",_target.getClass().getName(),interested,_applicableTypeNames,_annotatedTypeNames);
     }
 
-	public void resolveClasses(WebAppContext context, Map<String, Set<String>> classMap) 
-	{
+    public void resolveClasses(WebAppContext context, Map<String, Set<String>> classMap) 
+    {
         //We have already found the classes that directly have an annotation that was in the HandlesTypes
         //annotation of the ServletContainerInitializer. For each of those classes, walk the inheritance
         //hierarchy to find classes that extend or implement them.
@@ -173,7 +173,7 @@ public class ContainerInitializer
                 addInheritedTypes(classMap, (Set<String>)classMap.get(name));
             }
         }
-        
+
 
         //Now we need to look at the HandlesTypes classes that were not annotations. We need to
         //find all classes that extend or implement them.
@@ -185,20 +185,17 @@ public class ContainerInitializer
                 {
                     //find and add the classes that implement or extend the class.
                     //but not including the class itself
-                	System.err.println(c.getName());
-                	for (Map.Entry<String, Set<String>> e : classMap.entrySet() )
-                		System.err.println(e);
                     addInheritedTypes(classMap, (Set<String>)classMap.get(c.getName()));
                 }
             }
         }
-	}
-	
-	private void addInheritedTypes(Map<String, Set<String>> classMap,Set<String> names)
-	{
+    }
+
+    private void addInheritedTypes(Map<String, Set<String>> classMap,Set<String> names)
+    {
         if (names == null || names.isEmpty())
             return;
-     
+
         for (String s : names)
         {
             //add the name of the class
@@ -207,5 +204,5 @@ public class ContainerInitializer
             //walk the hierarchy and find all types that extend or implement the class
             addInheritedTypes(classMap, (Set<String>)classMap.get(s));
         }
-	}
+    }
 }

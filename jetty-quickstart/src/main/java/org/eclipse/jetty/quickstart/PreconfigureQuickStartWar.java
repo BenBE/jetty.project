@@ -103,11 +103,11 @@ public class PreconfigureQuickStartWar
             {
                 configure();
                 getMetaData().resolve(this);
-                
+
                 quickstartWebXml(this,new File(getWebInf().getFile(),"quickstart-web.xml"));
             }
         };
-        
+        webapp.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern", ".*/javax.servlet-api-[^/]*\\.jar$");
         webapp.setConfigurationClasses(PreconfigureQuickStartWar.__configurationClasses);
         webapp.setContextPath("/");
         webapp.setWar(war.getFile().getAbsolutePath());

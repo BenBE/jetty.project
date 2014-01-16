@@ -18,9 +18,16 @@
 
 package org.eclipse.jetty.quickstart;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.jetty.annotations.AnnotationConfiguration;
+import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
+import org.eclipse.jetty.plus.annotation.ContainerInitializer;
 import org.eclipse.jetty.webapp.Descriptor;
 import org.eclipse.jetty.webapp.IterativeDescriptorProcessor;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.xml.XmlParser;
 
 /**
  * QuickStartDescriptorProcessor
@@ -29,13 +36,21 @@ import org.eclipse.jetty.webapp.WebAppContext;
  */
 public class QuickStartDescriptorProcessor extends IterativeDescriptorProcessor
 {
+    public static final String CONTAINER_INITIALIZER_ID = "org.eclipse.jetty.containerInitializers";
 
     /**
      * 
      */
     public QuickStartDescriptorProcessor()
     {
-        //TODO register methods to handle additional elements only in quickstart-web.xml
+        try
+        {
+            registerVisitor("context-param", this.getClass().getDeclaredMethod("visitContextParam", __signature));
+        }    
+        catch (Exception e)
+        {
+            throw new IllegalStateException(e);
+        }
     }
 
     /**
@@ -53,5 +68,47 @@ public class QuickStartDescriptorProcessor extends IterativeDescriptorProcessor
     public void end(WebAppContext context, Descriptor descriptor)
     { 
     }
+    
 
+    /**
+     * @param context
+     * @param descriptor
+     * @param node
+     */
+    public void visitContextParam (WebAppContext context, Descriptor descriptor, XmlParser.Node node)
+    {
+        String name = node.getString("param-name", false, true);
+        String value = node.getString("param-value", false, true);
+        if (name.startsWith(CONTAINER_INITIALIZER_ID))
+        {
+            visitContainerInitializer(context, new ContainerInitializer(Thread.currentThread().getContextClassLoader(), value));
+            context.removeAttribute(name);
+        }
+    }
+    
+
+    public void visitContainerInitializer (WebAppContext context, ContainerInitializer containerInitializer)
+    {
+        if (containerInitializer == null)
+            return;
+        
+        //add the ContainerInitializer to the list of container initializers
+        List<ContainerInitializer> containerInitializers = (List<ContainerInitializer>)context.getAttribute(AnnotationConfiguration.CONTAINER_INITIALIZERS);
+        if (containerInitializers == null)
+        {
+            containerInitializers = new ArrayList<ContainerInitializer>();
+            context.setAttribute(AnnotationConfiguration.CONTAINER_INITIALIZERS, containerInitializers);
+        }
+        
+        containerInitializers.add(containerInitializer);
+
+        //Ensure a bean is set up on the context that will invoke the ContainerInitializers as the context starts
+        ServletContainerInitializersStarter starter = (ServletContainerInitializersStarter)context.getAttribute(AnnotationConfiguration.CONTAINER_INITIALIZER_STARTER);
+        if (starter == null)
+        {
+            starter = new ServletContainerInitializersStarter(context);
+            context.setAttribute(AnnotationConfiguration.CONTAINER_INITIALIZER_STARTER, starter);
+            context.addBean(starter, true);
+        }
+    }
 }
