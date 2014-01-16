@@ -34,22 +34,43 @@
     <dependency>
       <groupId>javax.transaction</groupId>
       <artifactId>javax.transaction-api</artifactId>
+      <version>1.2</version>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty.tests</groupId>
       <artifactId>test-mock-resources</artifactId>
       <version>${project.version}</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty.orbit</groupId>
       <artifactId>javax.mail.glassfish</artifactId>
       <version>1.4.1.v201005082020</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
     <plugins>
+
+    <plugin>
+      <groupId>org.codehaus.mojo</groupId>
+      <artifactId>appassembler-maven-plugin</artifactId>
+      <configuration>
+        <platforms>
+          <platform>unix</platform>
+        </platforms>
+        <programs>
+          <program>
+            <id>preconfigure</id>
+            <mainClass>org.eclipse.jetty.quickstart.PreconfigureQuickStartWar</mainClass>
+          </program>
+          <program>
+            <mainClass>org.eclipse.jetty.quickstart.QuickStartWar</mainClass>
+            <id>quickstart</id>
+          </program>
+        </programs>
+      </configuration>
+      </plugin>
+
       <plugin>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
