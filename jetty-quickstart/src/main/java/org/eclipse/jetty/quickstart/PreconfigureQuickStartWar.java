@@ -107,7 +107,7 @@ public class PreconfigureQuickStartWar
                 quickstartWebXml(this,new File(getWebInf().getFile(),"quickstart-web.xml"));
             }
         };
-        webapp.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern", ".*/javax.servlet-api-[^/]*\\.jar$");
+        webapp.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern", ".*/[^/]*servlet-api-[^/]*\\.jar$");
         webapp.setConfigurationClasses(PreconfigureQuickStartWar.__configurationClasses);
         webapp.setContextPath("/");
         webapp.setWar(war.getFile().getAbsolutePath());
@@ -134,11 +134,6 @@ public class PreconfigureQuickStartWar
     private static void quickstartWebXml(WebAppContext webapp,File webxml) throws IOException
     {
     	// webapp.dumpStdErr();
-
-    	Map<String,Set<String>> classMap = (Map<String, Set<String>>) webapp.getAttribute(AnnotationConfiguration.CLASS_INHERITANCE_MAP);
-    	for (Map.Entry<String, Set<String>> e : classMap.entrySet() )
-    		System.err.println(e);
-    	
     	
         XmlAppendable out = new XmlAppendable(new PrintStream(webxml));
         MetaData md = webapp.getMetaData();

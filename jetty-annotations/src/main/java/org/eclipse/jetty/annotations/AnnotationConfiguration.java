@@ -454,7 +454,6 @@ public class AnnotationConfiguration extends AbstractConfiguration
     }
 
 
-
     /** 
      * @see org.eclipse.jetty.webapp.AbstractConfiguration#postConfigure(org.eclipse.jetty.webapp.WebAppContext)
      */
