@@ -19,11 +19,16 @@
 package org.eclipse.jetty.quickstart;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import javax.servlet.ServletContext;
 
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
 import org.eclipse.jetty.plus.annotation.ContainerInitializer;
+import org.eclipse.jetty.util.StringUtil;
+import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.webapp.Descriptor;
 import org.eclipse.jetty.webapp.IterativeDescriptorProcessor;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -76,13 +81,39 @@ public class QuickStartDescriptorProcessor extends IterativeDescriptorProcessor
      * @param node
      */
     public void visitContextParam (WebAppContext context, Descriptor descriptor, XmlParser.Node node)
+            throws Exception
     {
         String name = node.getString("param-name", false, true);
         String value = node.getString("param-value", false, true);
         if (name.startsWith(CONTAINER_INITIALIZER_ID))
         {
-            visitContainerInitializer(context, new ContainerInitializer(Thread.currentThread().getContextClassLoader(), value));
-            context.removeAttribute(name);
+            if (value != null && !"".equals(value))
+            {
+                System.err.println("Got container initializer: "+value);
+                visitContainerInitializer(context, new ContainerInitializer(Thread.currentThread().getContextClassLoader(), value));
+                context.removeAttribute(name);
+            }
+            return;
+        }
+        if (name.equalsIgnoreCase(ServletContext.ORDERED_LIBS))
+        {
+            if (value != null && !"".equals(value.trim()))
+            {
+                context.setAttribute(ServletContext.ORDERED_LIBS, Arrays.asList(StringUtil.arrayFromString(value)));
+                context.removeAttribute(name);
+            }
+            return;
+        }
+        if (name.startsWith("org.eclipse.jetty.quickstart.baseResource"))
+        {
+            if (value != null && !"".equals(value.trim()))
+            {
+                Resource baseResource = Resource.newResource(value);
+                if (!context.getBaseResource().equals(baseResource))
+                    throw new IllegalStateException("Persisted baseResource("+value+") != actual baseResource("+context.getBaseResource()+")");
+                context.removeAttribute(name);
+            }
+            return;
         }
     }
     

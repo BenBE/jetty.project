@@ -80,8 +80,6 @@ public class QuickStartConfiguration extends AbstractConfiguration
             throw new IllegalStateException ("No WEB-INF/quickstart-web.xml");
         
         context.getMetaData().setWebXml(quickStartWebXml);
-        
-        //TODO check location inside effective-web.xml matches location of webapp
     }
 
     
