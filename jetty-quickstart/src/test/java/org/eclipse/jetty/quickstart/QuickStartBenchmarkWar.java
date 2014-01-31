@@ -18,6 +18,8 @@
 
 package org.eclipse.jetty.quickstart;
 
+import org.eclipse.jetty.util.log.Log;
+
 
 public class QuickStartBenchmarkWar 
 {

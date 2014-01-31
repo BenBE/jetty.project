@@ -192,8 +192,6 @@ public class MetaData
         _webXmlRoot.parse();
         _metaDataComplete=_webXmlRoot.getMetaDataComplete() == MetaDataComplete.True;
 
-
-
         if (_webXmlRoot.isOrdered())
         {
             if (_ordering == null)

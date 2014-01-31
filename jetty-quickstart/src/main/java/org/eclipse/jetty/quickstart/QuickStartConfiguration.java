@@ -66,18 +66,19 @@ public class QuickStartConfiguration extends AbstractConfiguration
         
         context.setBaseResource(webApp);
 
-        if (LOG.isDebugEnabled())
-            LOG.debug("webapp=" + webApp);
+        LOG.debug("webapp={}",webApp);
 
         
         //look for effective-web.xml in WEB-INF of webapp
         Resource webInf = context.getWebInf();
         if (webInf == null || !webInf.exists())
             throw new IllegalStateException("No WEB-INF");
+        LOG.debug("webinf={}",webInf);
   
         Resource quickStartWebXml = webInf.addPath("quickstart-web.xml");
         if (!quickStartWebXml.exists())
             throw new IllegalStateException ("No WEB-INF/quickstart-web.xml");
+        LOG.debug("quickStartWebXml={}",quickStartWebXml);
         
         context.getMetaData().setWebXml(quickStartWebXml);
     }
