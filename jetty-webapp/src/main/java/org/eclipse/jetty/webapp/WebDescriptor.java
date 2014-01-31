@@ -80,13 +80,11 @@ public class WebDescriptor extends Descriptor
                     mapped=true;
                 }
                 InputSource is = super.resolveEntity(pid,sid);
-                System.err.printf("{pid=%s,sid=%s}==>%s%n",pid,sid,is);
                 return is;
             }
             
             void mapResources()
             {
-                System.err.println("WASTING TIME");
                 //set up cache of DTDs and schemas locally
                 URL dtd22=Loader.getResource(Servlet.class,"javax/servlet/resources/web-app_2_2.dtd");
                 URL dtd23=Loader.getResource(Servlet.class,"javax/servlet/resources/web-app_2_3.dtd");
@@ -101,10 +99,11 @@ public class WebDescriptor extends Descriptor
                 URL webapp31xsd=Loader.getResource(Servlet.class,"javax/servlet/resources/web-app_3_1.xsd");
                 
                 URL webcommon30xsd=Loader.getResource(Servlet.class,"javax/servlet/resources/web-common_3_0.xsd");
-                URL webcommon31xsd=Loader.getResource(Servlet.class, "javax/servlet/resources/web-common_3_1.xsd");
+                URL webcommon31xsd=Loader.getResource(Servlet.class,"javax/servlet/resources/web-common_3_1.xsd");
             
                 URL webfragment30xsd=Loader.getResource(Servlet.class,"javax/servlet/resources/web-fragment_3_0.xsd");
-                URL webfragment31xsd=Loader.getResource(Servlet.class, "javax/servlet/resources/web-fragment_3_1.xsd");
+                URL webfragment31xsd=Loader.getResource(Servlet.class,"javax/servlet/resources/web-fragment_3_1.xsd");
+                
                 URL schemadtd=Loader.getResource(Servlet.class,"javax/servlet/resources/XMLSchema.dtd");
                 URL xmlxsd=Loader.getResource(Servlet.class,"javax/servlet/resources/xml.xsd");
                 URL webservice11xsd=Loader.getResource(Servlet.class,"javax/servlet/resources/j2ee_web_services_client_1_1.xsd");
