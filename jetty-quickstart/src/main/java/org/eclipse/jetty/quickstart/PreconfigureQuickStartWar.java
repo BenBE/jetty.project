@@ -38,6 +38,10 @@ import javax.servlet.ServletContext;
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
 import org.eclipse.jetty.plus.annotation.ContainerInitializer;
+import org.eclipse.jetty.security.ConstraintAware;
+import org.eclipse.jetty.security.ConstraintMapping;
+import org.eclipse.jetty.security.SecurityHandler;
+import org.eclipse.jetty.security.authentication.FormAuthenticator;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.FilterMapping;
@@ -47,6 +51,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlet.ServletMapping;
 import org.eclipse.jetty.util.resource.JarResource;
 import org.eclipse.jetty.util.resource.Resource;
+import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.webapp.MetaData;
 import org.eclipse.jetty.webapp.MetaData.OriginInfo;
 import org.eclipse.jetty.webapp.Origin;
@@ -56,6 +61,8 @@ import org.eclipse.jetty.xml.XmlConfiguration;
 
 public class PreconfigureQuickStartWar
 {
+    static final boolean ORIGIN=true;
+    
     public static final String[] __configurationClasses = new String[]
     { 
         org.eclipse.jetty.webapp.WebInfConfiguration.class.getCanonicalName(), org.eclipse.jetty.webapp.WebXmlConfiguration.class.getCanonicalName(),
@@ -276,6 +283,92 @@ public class PreconfigureQuickStartWar
             }
         }
 
+        // Security elements
+        SecurityHandler security = webapp.getSecurityHandler();
+        
+        if (security!=null && (security.getRealmName()!=null || security.getAuthMethod()!=null))
+        {
+            out.open("login-config");
+            if (security.getAuthMethod()!=null)
+                out.tag("auth-method",origin(md,"auth-method"),security.getAuthMethod());
+            if (security.getRealmName()!=null)
+                out.tag("realm-name",origin(md,"realm-name"),security.getRealmName());
+            
+            
+            if (Constraint.__FORM_AUTH.equalsIgnoreCase(security.getAuthMethod()))
+            {
+                out.open("form-login-config");
+                out.tag("form-login-page",origin(md,"form-login-page"),security.getInitParameter(FormAuthenticator.__FORM_LOGIN_PAGE));
+                out.tag("form-error-page",origin(md,"form-error-page"),security.getInitParameter(FormAuthenticator.__FORM_ERROR_PAGE));
+                out.close();
+            }
+            
+            out.close();
+        }
+        
+        if (security instanceof ConstraintAware)
+        {
+            ConstraintAware ca = (ConstraintAware)security;
+            for (String r:ca.getRoles())
+                out.open("security-role")
+                .tag("role-name",r)
+                .close();
+            
+            for (ConstraintMapping m : ca.getConstraintMappings())
+            {
+                out.open("security-constraint");
+                
+                if (m.getConstraint().getAuthenticate())
+                {
+                    out.open("auth-constraint");
+                    if (m.getConstraint().getRoles()!=null)
+                        for (String r : m.getConstraint().getRoles())
+                            out.tag("role-name",r);
+
+                    out.close();
+                }
+                
+                switch (m.getConstraint().getDataConstraint())
+                {
+                    case Constraint.DC_NONE:
+                        out.open("user-data-constraint").tag("transport-guarantee","NONE").close();
+                        break;
+                        
+                    case Constraint.DC_INTEGRAL:
+                        out.open("user-data-constraint").tag("transport-guarantee","INTEGRAL").close();
+                        break;
+                        
+                    case Constraint.DC_CONFIDENTIAL:
+                        out.open("user-data-constraint").tag("transport-guarantee","CONFIDENTIAL").close();
+                        break;
+                        
+                    default:
+                            break;
+                        
+                }
+
+                out.open("web-resource-collection");
+                {
+                    if (m.getConstraint().getName()!=null)
+                        out.tag("web-resource-name",m.getConstraint().getName());
+                    if (m.getPathSpec()!=null)
+                        out.tag("url-pattern",origin(md,"constraint.url."+m.getPathSpec()),m.getPathSpec());
+                    if (m.getMethod()!=null)
+                        out.tag("http-method",m.getMethod());
+
+                    if (m.getMethodOmissions()!=null)
+                        for (String o:m.getMethodOmissions())
+                            out.tag("http-method-omission",o);
+
+                    out.close();
+                }
+                
+                out.close();
+                
+            }
+        }
+        
+        
         out.close();
     }
 
@@ -309,10 +402,21 @@ public class PreconfigureQuickStartWar
                 .tag("role-name",s.getRunAsRole())
                 .close();
 
+            Map<String,String> roles = s.getRoleRefMap();
+            if (roles!=null)
+            {
+                for (Map.Entry<String, String> e : roles.entrySet())
+                {
+                    out.open("security-rol-ref",origin(md,ot+"role-name."+e.getKey()))
+                    .tag("role-name",e.getKey())
+                    .tag("role-link",e.getValue())
+                    .close();
+                }
+            }
+            
             if (!s.isEnabled())
                 out.tag("enabled",origin(md,ot + "enabled"),"false");
 
-            // TODO security-role-ref
             // TODO multipart-config
         }
 
@@ -322,6 +426,8 @@ public class PreconfigureQuickStartWar
 
     public static Map<String, String> origin(MetaData md, String name)
     {
+        if (!ORIGIN)
+            return Collections.emptyMap();
         if (name == null)
             return Collections.emptyMap();
         OriginInfo origin = md.getOriginInfo(name);

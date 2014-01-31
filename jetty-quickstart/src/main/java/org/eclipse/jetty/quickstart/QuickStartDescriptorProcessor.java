@@ -89,7 +89,7 @@ public class QuickStartDescriptorProcessor extends IterativeDescriptorProcessor
         {
             if (value != null && !"".equals(value))
             {
-                System.err.println("Got container initializer: "+value);
+                // System.err.println("Got container initializer: "+value);
                 visitContainerInitializer(context, new ContainerInitializer(Thread.currentThread().getContextClassLoader(), value));
                 context.removeAttribute(name);
             }

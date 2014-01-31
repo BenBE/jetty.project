@@ -25,8 +25,8 @@
     <module>jetty-osgi-npn</module>
     <module>jetty-osgi-httpservice</module>
     <module>test-jetty-osgi-webapp</module>
-    <module>test-jetty-osgi-context</module>
-    <module>test-jetty-osgi</module>
+    <!--module>test-jetty-osgi-context</module-->
+    <!--module>test-jetty-osgi</module-->
   </modules>
   <build>
     <resources>

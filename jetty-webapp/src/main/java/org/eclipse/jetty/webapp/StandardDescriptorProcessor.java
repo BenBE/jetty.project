@@ -1464,18 +1464,18 @@ public class StandardDescriptorProcessor extends IterativeDescriptorProcessor
                     //remember origin so we can process ServletRegistration.Dynamic.setServletSecurityElement() correctly
                     context.getMetaData().setOrigin("constraint.url."+url, descriptor);
                     
-                    Iterator<XmlParser.Node> iter3 = collection.iterator("http-method");
-                    Iterator<XmlParser.Node> iter4 = collection.iterator("http-method-omission");
+                    Iterator<XmlParser.Node> methods = collection.iterator("http-method");
+                    Iterator<XmlParser.Node> ommissions = collection.iterator("http-method-omission");
                    
-                    if (iter3.hasNext())
+                    if (methods.hasNext())
                     {
-                        if (iter4.hasNext())
+                        if (ommissions.hasNext())
                             throw new IllegalStateException ("web-resource-collection cannot contain both http-method and http-method-omission");
                         
                         //configure all the http-method elements for each url
-                        while (iter3.hasNext())
+                        while (methods.hasNext())
                         {
-                            String method = ((XmlParser.Node) iter3.next()).toString(false, true);
+                            String method = ((XmlParser.Node) methods.next()).toString(false, true);
                             ConstraintMapping mapping = new ConstraintMapping();
                             mapping.setMethod(method);
                             mapping.setPathSpec(url);
@@ -1483,12 +1483,13 @@ public class StandardDescriptorProcessor extends IterativeDescriptorProcessor
                             ((ConstraintAware)context.getSecurityHandler()).addConstraintMapping(mapping);
                         }
                     }
-                    else if (iter4.hasNext())
+                    else if (ommissions.hasNext())
                     {
                         //configure all the http-method-omission elements for each url
-                        while (iter4.hasNext())
+                        // TODO use the array
+                        while (ommissions.hasNext())
                         {
-                            String method = ((XmlParser.Node)iter4.next()).toString(false, true);
+                            String method = ((XmlParser.Node)ommissions.next()).toString(false, true);
                             ConstraintMapping mapping = new ConstraintMapping();
                             mapping.setMethodOmissions(new String[]{method});
                             mapping.setPathSpec(url);
@@ -1595,7 +1596,7 @@ public class StandardDescriptorProcessor extends IterativeDescriptorProcessor
                     LOG.warn(new Throwable()); // TODO throw ISE?
             }
 
-            if (Constraint.__FORM_AUTH.equals(context.getSecurityHandler().getAuthMethod()))
+            if (Constraint.__FORM_AUTH.equalsIgnoreCase(context.getSecurityHandler().getAuthMethod()))
             {
                 XmlParser.Node formConfig = node.get("form-login-config");
                 if (formConfig != null)
