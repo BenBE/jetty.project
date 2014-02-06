@@ -65,9 +65,12 @@ public class PreconfigureQuickStartWar
     
     public static final String[] __configurationClasses = new String[]
     { 
-        org.eclipse.jetty.webapp.WebInfConfiguration.class.getCanonicalName(), org.eclipse.jetty.webapp.WebXmlConfiguration.class.getCanonicalName(),
-        org.eclipse.jetty.webapp.MetaInfConfiguration.class.getCanonicalName(), org.eclipse.jetty.webapp.FragmentConfiguration.class.getCanonicalName(),
-        org.eclipse.jetty.plus.webapp.EnvConfiguration.class.getCanonicalName(), org.eclipse.jetty.plus.webapp.PlusConfiguration.class.getCanonicalName(),
+        org.eclipse.jetty.webapp.WebInfConfiguration.class.getCanonicalName(), 
+        org.eclipse.jetty.webapp.WebXmlConfiguration.class.getCanonicalName(),
+        org.eclipse.jetty.webapp.MetaInfConfiguration.class.getCanonicalName(), 
+        org.eclipse.jetty.webapp.FragmentConfiguration.class.getCanonicalName(),
+        org.eclipse.jetty.plus.webapp.EnvConfiguration.class.getCanonicalName(), 
+        org.eclipse.jetty.plus.webapp.PlusConfiguration.class.getCanonicalName(),
         org.eclipse.jetty.annotations.AnnotationConfiguration.class.getCanonicalName(),
     };
 
@@ -112,6 +115,18 @@ public class PreconfigureQuickStartWar
                 break;
         }
 
+        
+        preconfigure(war,dir,xml);
+    }
+
+    /**
+     * @param war The war (or directory) to preconfigure
+     * @param dir The directory to expand the war into (or null if war is a directory)
+     * @param xml A context XML to apply (or null if none)
+     * @throws Exception
+     */
+    public static void preconfigure(Resource war, Resource dir, Resource xml) throws Exception 
+    {
         // Do we need to unpack a war?
         if (war != null)
         {
@@ -122,10 +137,10 @@ public class PreconfigureQuickStartWar
                 dir.getFile().mkdirs();
             JarResource.newJarResource(war).copyTo(dir.getFile());
         }
-
+        
         final Server server = new Server();
 
-        WebAppContext webapp = new WebAppContext()
+        QuickStartWebApp webapp = new QuickStartWebApp()
         {
             @Override
             protected void startContext() throws Exception
@@ -139,7 +154,6 @@ public class PreconfigureQuickStartWar
         webapp.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",".*/[^/]*servlet-api-[^/]*\\.jar$");
         webapp.setConfigurationClasses(PreconfigureQuickStartWar.__configurationClasses);
         webapp.setContextPath("/");
-        webapp.setWar(dir.getFile().getAbsolutePath());
 
         if (xml != null)
         {
@@ -148,11 +162,16 @@ public class PreconfigureQuickStartWar
             XmlConfiguration xmlConfiguration = new XmlConfiguration(xml.getURL());
             xmlConfiguration.configure(webapp);
         }
+        webapp.setAutoPreconfigure(false);
+        webapp.setResourceBase(dir.getFile().getAbsolutePath());
         server.setHandler(webapp);
 
         server.start();
         server.stop();
     }
+    
+    
+    
 
     private static void error(String message)
     {

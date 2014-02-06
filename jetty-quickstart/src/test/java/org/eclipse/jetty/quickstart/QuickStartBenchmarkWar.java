@@ -27,7 +27,7 @@ public class QuickStartBenchmarkWar
     public static void main(String... args) throws Exception
     {   
         // Log.getRootLogger().setDebugEnabled(true);
-        QuickStartWar.main("target/benchmark-preconfigured");
+        QuickStartWebApp.main("target/benchmark-preconfigured");
 
     }
 }

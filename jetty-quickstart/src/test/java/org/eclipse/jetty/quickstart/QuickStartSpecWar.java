@@ -32,6 +32,6 @@ public class QuickStartSpecWar
     {   
         // Log.getRootLogger().setDebugEnabled(true);
        System.setProperty("jetty.home", "target");
-       QuickStartWar.main("target/test-spec-preconfigured", "src/test/resources/test-spec.xml");
+       QuickStartWebApp.main("target/test-spec-preconfigured", "src/test/resources/test-spec.xml");
     }
 }

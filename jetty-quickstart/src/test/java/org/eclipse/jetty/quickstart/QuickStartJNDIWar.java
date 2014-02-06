@@ -30,6 +30,6 @@ public class QuickStartJNDIWar
     public static void main(String... args) throws Exception
     {   
         // Log.getRootLogger().setDebugEnabled(true);
-        QuickStartWar.main("target/test-jndi-preconfigured", "src/test/resources/test-jndi.xml");
+        QuickStartWebApp.main("target/test-jndi-preconfigured", "src/test/resources/test-jndi.xml");
     }
 }

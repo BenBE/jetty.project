@@ -31,10 +31,10 @@ import org.eclipse.jetty.xml.XmlConfiguration;
  * QuickStartWar
  *
  */
-public class QuickStartWar
+public class QuickStartWebApp extends WebAppContext
 {
-    public static final long __start=System.nanoTime();
     private static final Logger LOG = Log.getLogger(Server.class);
+    public static final long __start=System.nanoTime();
     
     public static final String[] __configurationClasses = new String[] 
             {
@@ -44,9 +44,83 @@ public class QuickStartWar
                 org.eclipse.jetty.webapp.JettyWebXmlConfiguration.class.getCanonicalName()
             };
     
+    
+    private boolean _autoPrecompile=false;
+    private String _xml=null;
+    
+    
+    public QuickStartWebApp()
+    {
+        super();
+        setConfigurationClasses(__configurationClasses);
+    }
+
+    public boolean isAutoPrecompile()
+    {
+        return _autoPrecompile;
+    }
+    
+    public void setAutoPreconfigure(boolean autoPrecompile)
+    {
+        _autoPrecompile = autoPrecompile;
+    }
+
+    @Override
+    protected void doStart() throws Exception
+    {
+        Resource war = null;
+        Resource dir = null;
+        Resource xml = null;
+        
+        Resource base = getBaseResource();
+        if (base==null)
+            base=Resource.newResource(getWar());
+        
+        if (base.isDirectory())
+            dir=base;
+        else if (base.toString().toLowerCase().endsWith(".war"))
+        {
+            war=base;
+            String w=war.toString();
+            dir=Resource.newResource(w.substring(0,w.length()-4));
+        }
+        else 
+            throw new IllegalArgumentException();
+
+        Resource qswebxml=dir.addPath("/WEB-INF/quickstart-web.xml");
+        if (_autoPrecompile && (!dir.isDirectory() || !qswebxml.exists()))
+        {   
+            if (_xml!=null)
+                xml=Resource.newResource(_xml);
+            else
+            {
+                Resource x=Resource.newResource(dir.toString()+".xml");
+                if (x.exists())
+                    xml=x;
+                else 
+                {
+                    x=Resource.newResource(dir.toString()+".XML"); 
+                    if (x.exists())
+                        xml=x;
+                }
+            }
+            
+            LOG.info("Precompile for quickstart: {}({},{},{})",this,war,dir,xml);
+            PreconfigureQuickStartWar.preconfigure(war,dir,xml);
+        }
+
+        setWar(null);
+        setBaseResource(dir);
+
+        super.doStart();
+    }
+
+
+
+
+
     public static void main(String... args) throws Exception
     {   
-
         if (args.length<1)
             error("No WAR file or directory given");
         
@@ -60,10 +134,10 @@ public class QuickStartWar
         
         Server server = new Server(8080);
         
-        WebAppContext webapp = new WebAppContext();
-        webapp.setConfigurationClasses(__configurationClasses);
-        webapp.setContextPath("/");
+        QuickStartWebApp webapp = new QuickStartWebApp();
+        webapp.setAutoPreconfigure(true);
         webapp.setWar(war);
+        webapp.setContextPath("/");
 
         //apply context xml file
         if (contextXml != null)
@@ -72,7 +146,6 @@ public class QuickStartWar
             XmlConfiguration xmlConfiguration = new XmlConfiguration(contextXml.getURL());  
             xmlConfiguration.configure(webapp);   
         }
-
         
         server.setHandler(webapp);
 
