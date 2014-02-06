@@ -45,7 +45,7 @@ public class QuickStartWebApp extends WebAppContext
             };
     
     
-    private boolean _autoPrecompile=false;
+    private boolean _autoPreconfigure=false;
     private String _xml=null;
     
     
@@ -55,14 +55,14 @@ public class QuickStartWebApp extends WebAppContext
         setConfigurationClasses(__configurationClasses);
     }
 
-    public boolean isAutoPrecompile()
+    public boolean isAutoPreconfigure()
     {
-        return _autoPrecompile;
+        return _autoPreconfigure;
     }
     
     public void setAutoPreconfigure(boolean autoPrecompile)
     {
-        _autoPrecompile = autoPrecompile;
+        _autoPreconfigure = autoPrecompile;
     }
 
     @Override
@@ -88,7 +88,7 @@ public class QuickStartWebApp extends WebAppContext
             throw new IllegalArgumentException();
 
         Resource qswebxml=dir.addPath("/WEB-INF/quickstart-web.xml");
-        if (_autoPrecompile && (!dir.isDirectory() || !qswebxml.exists()))
+        if (_autoPreconfigure && (!dir.isDirectory() || !qswebxml.exists()))
         {   
             if (_xml!=null)
                 xml=Resource.newResource(_xml);
