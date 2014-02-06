@@ -105,7 +105,7 @@ public class QuickStartWebApp extends WebAppContext
                 }
             }
             
-            LOG.info("Precompile for quickstart: {}({},{},{})",this,war,dir,xml);
+            LOG.info("Preconfigure for quickstart: {}(war={},dir={},xml={})",this,war,dir,xml);
             PreconfigureQuickStartWar.preconfigure(war,dir,xml);
         }
 
