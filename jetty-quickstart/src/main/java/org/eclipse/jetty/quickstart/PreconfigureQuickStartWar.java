@@ -397,7 +397,20 @@ public class PreconfigureQuickStartWar
             }
             out.close();
         }
-        
+    
+        Map<String,String> localeEncodings = webapp.getLocaleEncodings();
+        if (localeEncodings != null && !localeEncodings.isEmpty())
+        {
+            out.open("locale-encoding-mapping-list");
+            for (Map.Entry<String, String> entry:localeEncodings.entrySet())
+            {
+                out.open("locale-encoding-mapping", origin(md,"locale-encoding."+entry.getKey()));
+                out.tag("locale", entry.getKey());
+                out.tag("encoding", entry.getValue());
+                out.close();
+            }
+            out.close();
+        }
         
         out.close();
     }
