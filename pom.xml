@@ -430,7 +430,7 @@
     <module>jetty-client</module>
     <module>jetty-proxy</module>
     <module>jetty-jaspi</module>
-    <module>jetty-osgi</module>
+    <!-- module>jetty-osgi</module -->
     <module>jetty-rewrite</module>
     <module>jetty-nosql</module>
     <module>tests</module>
