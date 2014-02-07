@@ -18,8 +18,6 @@
 
 package org.eclipse.jetty.quickstart;
 
-import java.util.concurrent.TimeUnit;
-
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
@@ -33,8 +31,7 @@ import org.eclipse.jetty.xml.XmlConfiguration;
  */
 public class QuickStartWebApp extends WebAppContext
 {
-    private static final Logger LOG = Log.getLogger(Server.class);
-    public static final long __start=System.nanoTime();
+    private static final Logger LOG = Log.getLogger(QuickStartWebApp.class);
     
     public static final String[] __configurationClasses = new String[] 
             {
@@ -113,9 +110,6 @@ public class QuickStartWebApp extends WebAppContext
         setBaseResource(dir);
 
         super.doStart();
-
-        long end = System.nanoTime();
-        LOG.info(String.format("Started in %dms: %s",new Long(TimeUnit.NANOSECONDS.toMillis(end-__start)),this));
     }
 
 
