@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.DispatcherType;
+import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 
@@ -446,7 +447,18 @@ public class PreconfigureQuickStartWar
             if (!s.isEnabled())
                 out.tag("enabled",origin(md,ot + "enabled"),"false");
 
-            // TODO multipart-config
+            //multipart-config
+            MultipartConfigElement multipartConfig = ((ServletHolder.Registration)s.getRegistration()).getMultipartConfig();
+            if (multipartConfig != null)
+            {
+                out.open("multipart-config", origin(md, s.getName()+".servlet.multipart-config"));
+                if (multipartConfig.getLocation() != null)
+                    out.tag("location", multipartConfig.getLocation());
+                out.tag("max-file-size", Long.toString(multipartConfig.getMaxFileSize()));
+                out.tag("max-request-size", Long.toString(multipartConfig.getMaxRequestSize()));
+                out.tag("file-size-threshold", Long.toString(multipartConfig.getFileSizeThreshold()));
+                out.close();
+            }
         }
 
         out.tag("async-supported",origin(md,ot + "async-supported"),holder.isAsyncSupported()?"true":"false");
