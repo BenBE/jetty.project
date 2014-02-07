@@ -113,9 +113,10 @@ public class QuickStartWebApp extends WebAppContext
         setBaseResource(dir);
 
         super.doStart();
+
+        long end = System.nanoTime();
+        LOG.info(String.format("Started in %dms: %s",new Long(TimeUnit.NANOSECONDS.toMillis(end-__start)),this));
     }
-
-
 
 
 
@@ -149,13 +150,9 @@ public class QuickStartWebApp extends WebAppContext
         
         server.setHandler(webapp);
 
-        long serverStart = System.nanoTime();
         server.start();
 
-        long end = System.nanoTime();
         
-        System.err.println("Server start in "+ TimeUnit.NANOSECONDS.toMillis(end-serverStart));
-        System.err.println("Started in "+TimeUnit.NANOSECONDS.toMillis(end-__start));
       
         server.join();
     }
