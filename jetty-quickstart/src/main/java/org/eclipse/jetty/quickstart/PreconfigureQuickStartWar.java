@@ -387,6 +387,16 @@ public class PreconfigureQuickStartWar
             }
         }
         
+        if (webapp.getWelcomeFiles() != null)
+        {
+            out.open("welcome-file-list");
+            for (String welcomeFile:webapp.getWelcomeFiles())
+            {
+                out.tag("welcome-file", welcomeFile);
+            }
+            out.close();
+        }
+        
         
         out.close();
     }
