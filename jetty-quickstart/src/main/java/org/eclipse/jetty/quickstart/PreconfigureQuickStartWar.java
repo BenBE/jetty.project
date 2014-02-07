@@ -426,7 +426,7 @@ public class PreconfigureQuickStartWar
             {
                 for (Map.Entry<String, String> e : roles.entrySet())
                 {
-                    out.open("security-rol-ref",origin(md,ot+"role-name."+e.getKey()))
+                    out.open("security-role-ref",origin(md,ot+"role-name."+e.getKey()))
                     .tag("role-name",e.getKey())
                     .tag("role-link",e.getValue())
                     .close();
