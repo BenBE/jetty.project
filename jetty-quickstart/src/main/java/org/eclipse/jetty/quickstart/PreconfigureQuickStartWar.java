@@ -35,6 +35,8 @@ import javax.servlet.DispatcherType;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
+import javax.servlet.SessionCookieConfig;
+import javax.servlet.SessionTrackingMode;
 
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
@@ -410,6 +412,45 @@ public class PreconfigureQuickStartWar
                 out.close();
             }
             out.close();
+        }
+
+        //session-config
+        if (webapp.getSessionHandler().getSessionManager() != null)
+        {
+            out.open("session-config");
+            int maxInactiveSec = webapp.getSessionHandler().getSessionManager().getMaxInactiveInterval();
+            out.tag("session-timeout", (maxInactiveSec==0?"0":Integer.toString(maxInactiveSec/60)));
+ 
+            Set<SessionTrackingMode> modes = webapp.getSessionHandler().getSessionManager().getEffectiveSessionTrackingModes();
+            if (modes != null)
+            {
+                for (SessionTrackingMode mode:modes)
+                    out.tag("tracking-mode", mode.toString());
+            }
+            
+            //cookie-config
+            SessionCookieConfig cookieConfig = webapp.getSessionHandler().getSessionManager().getSessionCookieConfig();
+            if (cookieConfig != null)
+            {
+                out.open("cookie-config");
+                if (cookieConfig.getName() != null)
+                    out.tag("name", origin(md,"cookie-config.name"), cookieConfig.getName());
+                
+                if (cookieConfig.getDomain() != null)
+                    out.tag("domain", origin(md, "cookie-config.domain"), cookieConfig.getDomain());
+                
+                if (cookieConfig.getPath() != null)
+                    out.tag("path", origin(md, "cookie-config.path"), cookieConfig.getPath());
+                
+                if (cookieConfig.getComment() != null)
+                    out.tag("comment", origin(md, "cookie-config.comment"), cookieConfig.getComment());
+                
+                out.tag("http-only", origin(md, "cookie-config.http-only"), Boolean.toString(cookieConfig.isHttpOnly()));
+                out.tag("secure", origin(md, "cookie-config.secure"), Boolean.toString(cookieConfig.isSecure()));
+                out.tag("max-age", origin(md, "cookie-config.max-age"), Integer.toString(cookieConfig.getMaxAge()));
+                out.close();
+            }
+            out.close();     
         }
         
         out.close();
