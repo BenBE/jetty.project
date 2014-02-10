@@ -40,6 +40,7 @@ import javax.servlet.SessionTrackingMode;
 
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
+import org.eclipse.jetty.http.MimeTypes;
 import org.eclipse.jetty.plus.annotation.ContainerInitializer;
 import org.eclipse.jetty.security.ConstraintAware;
 import org.eclipse.jetty.security.ConstraintMapping;
@@ -470,6 +471,19 @@ public class PreconfigureQuickStartWar
                         out.tag("exception-type", entry.getKey());
                 }
                 out.tag("location", entry.getValue());
+                out.close();
+            }
+        }
+        
+        //mime-types
+        MimeTypes mimeTypes = webapp.getMimeTypes();
+        if (mimeTypes != null)
+        {
+            for (Map.Entry<String, String> entry:mimeTypes.getMimeMap().entrySet())
+            {
+                out.open("mime-mapping");
+                out.tag("extension", origin(md, "extension."+entry.getKey()), entry.getKey());
+                out.tag("mime-type", entry.getValue());
                 out.close();
             }
         }
