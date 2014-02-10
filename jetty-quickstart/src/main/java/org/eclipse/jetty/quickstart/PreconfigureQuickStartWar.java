@@ -46,6 +46,7 @@ import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.security.authentication.FormAuthenticator;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.FilterMapping;
 import org.eclipse.jetty.servlet.Holder;
@@ -451,6 +452,26 @@ public class PreconfigureQuickStartWar
                 out.close();
             }
             out.close();     
+        }
+        
+        //error-pages
+        Map<String,String> errorPages = ((ErrorPageErrorHandler)webapp.getErrorHandler()).getErrorPages();
+        if (errorPages != null)
+        {
+            for (Map.Entry<String, String> entry:errorPages.entrySet())
+            {
+                out.open("error-page", origin(md, "error."+entry.getKey()));
+                //a global or default error page has no code or exception               
+                if (!ErrorPageErrorHandler.GLOBAL_ERROR_PAGE.equals(entry.getKey()))
+                {
+                    if (entry.getKey().matches("\\d{3}"))
+                        out.tag("error-code", entry.getKey());
+                    else
+                        out.tag("exception-type", entry.getKey());
+                }
+                out.tag("location", entry.getValue());
+                out.close();
+            }
         }
         
         out.close();
