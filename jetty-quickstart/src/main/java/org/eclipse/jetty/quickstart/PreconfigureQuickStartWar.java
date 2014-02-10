@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URLClassLoader;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EventListener;
 import java.util.HashMap;
@@ -37,6 +38,8 @@ import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
+import javax.servlet.descriptor.JspPropertyGroupDescriptor;
+import javax.servlet.descriptor.TaglibDescriptor;
 
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
@@ -51,6 +54,8 @@ import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.FilterMapping;
 import org.eclipse.jetty.servlet.Holder;
+import org.eclipse.jetty.servlet.ServletContextHandler.JspConfig;
+import org.eclipse.jetty.servlet.ServletContextHandler.JspPropertyGroup;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlet.ServletMapping;
@@ -486,6 +491,83 @@ public class PreconfigureQuickStartWar
                 out.tag("mime-type", entry.getValue());
                 out.close();
             }
+        }
+        
+        //jsp-config
+        JspConfig jspConfig = (JspConfig)webapp.getServletContext().getJspConfigDescriptor();
+        if (jspConfig != null)
+        {
+            out.open("jsp-config");
+            Collection<TaglibDescriptor> tlds = jspConfig.getTaglibs();
+            if (tlds != null && !tlds.isEmpty())
+            {
+                for (TaglibDescriptor tld:tlds)
+                {
+                    out.open("taglib");
+                    out.tag("taglib-uri", tld.getTaglibURI());
+                    out.tag("taglib-location", tld.getTaglibLocation());
+                    out.close();
+                }
+            }
+            
+            Collection<JspPropertyGroupDescriptor> jspPropertyGroups = jspConfig.getJspPropertyGroups();
+            if (jspPropertyGroups != null && !jspPropertyGroups.isEmpty())
+            {
+                for (JspPropertyGroupDescriptor jspPropertyGroup:jspPropertyGroups)
+                {
+                    out.open("jsp-property-group");
+                    Collection<String> strings = jspPropertyGroup.getUrlPatterns();
+                    if (strings != null && !strings.isEmpty())
+                    {
+                        for (String urlPattern:strings)
+                            out.tag("url-pattern", urlPattern);
+                    }
+
+                    if (jspPropertyGroup.getElIgnored() != null)
+                        out.tag("el-ignored", jspPropertyGroup.getElIgnored());
+
+                    if (jspPropertyGroup.getPageEncoding() != null)
+                        out.tag("page-encoding", jspPropertyGroup.getPageEncoding());
+
+                    if (jspPropertyGroup.getScriptingInvalid() != null)
+                        out.tag("scripting-invalid", jspPropertyGroup.getScriptingInvalid());
+
+                    if (jspPropertyGroup.getIsXml() != null)
+                        out.tag("is-xml", jspPropertyGroup.getIsXml());
+
+                    if (jspPropertyGroup.getDeferredSyntaxAllowedAsLiteral() != null)
+                        out.tag("deferred-syntax-allowed-as-literal", jspPropertyGroup.getDeferredSyntaxAllowedAsLiteral());
+
+                    if (jspPropertyGroup.getTrimDirectiveWhitespaces() != null)
+                        out.tag("trim-directive-whitespaces", jspPropertyGroup.getTrimDirectiveWhitespaces());
+
+                    if (jspPropertyGroup.getDefaultContentType() != null)
+                        out.tag("default-content-type", jspPropertyGroup.getDefaultContentType());
+
+                    if (jspPropertyGroup.getBuffer() != null)
+                        out.tag("buffer", jspPropertyGroup.getBuffer());
+
+                    if (jspPropertyGroup.getErrorOnUndeclaredNamespace() != null)
+                        out.tag("error-on-undeclared-namespace", jspPropertyGroup.getErrorOnUndeclaredNamespace());
+
+                    strings = jspPropertyGroup.getIncludePreludes();
+                    if (strings != null && !strings.isEmpty())
+                    {
+                        for (String prelude:strings)
+                            out.tag("include-prelude", prelude);
+                    }
+                   
+                    strings = jspPropertyGroup.getIncludeCodas();
+                    if (strings != null && !strings.isEmpty())
+                    {
+                        for (String coda:strings)
+                            out.tag("include-coda", coda);
+                    }
+                   
+                    out.close();
+                }
+            }
+            out.close();
         }
         
         out.close();
