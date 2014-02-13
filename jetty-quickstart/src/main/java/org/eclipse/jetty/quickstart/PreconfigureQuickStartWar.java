@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Collection;
@@ -66,6 +67,7 @@ import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.webapp.MetaData;
 import org.eclipse.jetty.webapp.MetaData.OriginInfo;
+import org.eclipse.jetty.webapp.MetaInfConfiguration;
 import org.eclipse.jetty.webapp.Origin;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.xml.XmlAppendable;
@@ -234,6 +236,7 @@ public class PreconfigureQuickStartWar
             .tag("param-value",webapp.getAttribute(ServletContext.ORDERED_LIBS).toString())
             .close();
 
+        //the servlet container initializers
         List<ContainerInitializer> initializers = (List<ContainerInitializer>)webapp.getAttribute(AnnotationConfiguration.CONTAINER_INITIALIZERS);
         if (initializers != null && !initializers.isEmpty())
         {
@@ -247,6 +250,34 @@ public class PreconfigureQuickStartWar
             }
         }
 
+        //the tlds discovered
+        Collection<URL> metaInfTlds = (Collection<URL>)webapp.getAttribute(MetaInfConfiguration.METAINF_TLDS);
+        if (metaInfTlds != null && !metaInfTlds.isEmpty())
+        {
+            int i = 0;
+            for (URL tld:metaInfTlds)
+            {
+                out.open("context-param");
+                out.tag("param-name", MetaInfConfiguration.METAINF_TLDS+"."+i++);
+                out.tag("param-value", tld.toString());
+                out.close();
+            }
+        }
+        
+        //the META-INF/resources discovered
+        Collection<Resource> resourceDirs = (Collection<Resource>)webapp.getAttribute(MetaInfConfiguration.METAINF_RESOURCES);
+        if (resourceDirs != null && !resourceDirs.isEmpty())
+        {
+            int i = 0;
+            for (Resource d:resourceDirs)
+            {
+                out.open("context-param");
+                out.tag("param-name", MetaInfConfiguration.METAINF_RESOURCES+"."+i++);
+                out.tag("param-value", d.toString());
+                out.close();
+            }
+        }
+        
         for (String p : webapp.getInitParams().keySet())
             out.open("context-param",origin(md,"context-param." + p))
             .tag("param-name",p)
