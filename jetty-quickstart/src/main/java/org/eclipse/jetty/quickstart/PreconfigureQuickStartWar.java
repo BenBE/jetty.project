@@ -45,6 +45,8 @@ import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
 import org.eclipse.jetty.http.MimeTypes;
 import org.eclipse.jetty.plus.annotation.ContainerInitializer;
+import org.eclipse.jetty.plus.annotation.LifeCycleCallback;
+import org.eclipse.jetty.plus.annotation.LifeCycleCallbackCollection;
 import org.eclipse.jetty.security.ConstraintAware;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.SecurityHandler;
@@ -568,6 +570,30 @@ public class PreconfigureQuickStartWar
                 }
             }
             out.close();
+        }
+
+        //lifecycle: post-construct, pre-destroy
+        LifeCycleCallbackCollection lifecycles = ((LifeCycleCallbackCollection)webapp.getAttribute(LifeCycleCallbackCollection.LIFECYCLE_CALLBACK_COLLECTION));
+        if (lifecycles != null)
+        {
+            Collection<LifeCycleCallback> tmp = lifecycles.getPostConstructCallbacks();
+
+            for (LifeCycleCallback c:tmp)
+            {
+                out.open("post-costruct");
+                out.tag("lifecycle-callback-class", c.getTargetClassName());
+                out.tag("lifecycle-callback-method", c.getMethodName());
+                out.close();
+            }
+            
+            tmp = lifecycles.getPreDestroyCallbacks();
+            for (LifeCycleCallback c:tmp)
+            {
+                out.open("pre-destroy");
+                out.tag("lifecycle-callback-class", c.getTargetClassName());
+                out.tag("lifecycle-callback-method", c.getMethodName());
+                out.close();
+            }
         }
         
         out.close();
