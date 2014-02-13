@@ -37,9 +37,12 @@ public class PreconfigureDescriptorProcessor extends IterativeDescriptorProcesso
     private static final Logger LOG = Log.getLogger(PreconfigureDescriptorProcessor.class);
     
     private final StringBuilder _buffer = new StringBuilder();
+    private final boolean _showOrigin;
+    private String _origin;
 
-    public PreconfigureDescriptorProcessor ()
+    public PreconfigureDescriptorProcessor (boolean showOrigin)
     {
+        _showOrigin=showOrigin;
         try
         {
             registerVisitor("env-entry", getClass().getDeclaredMethod("saveSnippet", __signature));
@@ -58,7 +61,7 @@ public class PreconfigureDescriptorProcessor extends IterativeDescriptorProcesso
     public void start(WebAppContext context, Descriptor descriptor)
     {
         LOG.debug("process {}",descriptor);
-        _buffer.append("\n  <!-- ").append(descriptor).append(" -->\n");
+        _origin=("  <!-- "+descriptor+" -->\n");
     }
 
 
@@ -72,6 +75,8 @@ public class PreconfigureDescriptorProcessor extends IterativeDescriptorProcesso
     throws Exception
     {
         LOG.debug("save {}",node.getTag());
+        if (_showOrigin)
+            _buffer.append(_origin);
         _buffer.append("  ").append(node.toString()).append("\n");
     }
     

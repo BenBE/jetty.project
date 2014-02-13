@@ -151,7 +151,7 @@ public class PreconfigureQuickStartWar
         }
         
         final Server server = new Server();
-        final PreconfigureDescriptorProcessor literalXml = new PreconfigureDescriptorProcessor();
+        final PreconfigureDescriptorProcessor literalXml = new PreconfigureDescriptorProcessor(ORIGIN);
 
         QuickStartWebApp webapp = new QuickStartWebApp()
         {
