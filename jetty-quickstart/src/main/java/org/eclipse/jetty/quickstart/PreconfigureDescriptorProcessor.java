@@ -46,6 +46,7 @@ public class PreconfigureDescriptorProcessor extends IterativeDescriptorProcesso
             registerVisitor("resource-ref", getClass().getDeclaredMethod("saveSnippet", __signature));
             registerVisitor("resource-env-ref", getClass().getDeclaredMethod("saveSnippet", __signature));
             registerVisitor("message-destination-ref", getClass().getDeclaredMethod("saveSnippet", __signature));
+            registerVisitor("data-source", getClass().getDeclaredMethod("saveSnippet", __signature));
         }
         catch (Exception e)
         {

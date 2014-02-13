@@ -151,7 +151,7 @@ public class PreconfigureQuickStartWar
         }
         
         final Server server = new Server();
-        final PreconfigureDescriptorProcessor jndiXml = new PreconfigureDescriptorProcessor();
+        final PreconfigureDescriptorProcessor literalXml = new PreconfigureDescriptorProcessor();
 
         QuickStartWebApp webapp = new QuickStartWebApp()
         {
@@ -161,13 +161,13 @@ public class PreconfigureQuickStartWar
                 configure();
                 getMetaData().resolve(this);
 
-                quickstartWebXml(this,jndiXml.getXML());
+                quickstartWebXml(this,literalXml.getXML());
             }
         };
         webapp.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",".*/[^/]*servlet-api-[^/]*\\.jar$");
         webapp.setConfigurationClasses(PreconfigureQuickStartWar.__configurationClasses);
         webapp.setContextPath("/");
-        webapp.getMetaData().addDescriptorProcessor(jndiXml);
+        webapp.getMetaData().addDescriptorProcessor(literalXml);
 
         if (xml != null)
         {
