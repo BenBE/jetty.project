@@ -151,6 +151,7 @@ public class PreconfigureQuickStartWar
         }
         
         final Server server = new Server();
+        final PreconfigureDescriptorProcessor jndiXml = new PreconfigureDescriptorProcessor();
 
         QuickStartWebApp webapp = new QuickStartWebApp()
         {
@@ -160,12 +161,13 @@ public class PreconfigureQuickStartWar
                 configure();
                 getMetaData().resolve(this);
 
-                quickstartWebXml(this);
+                quickstartWebXml(this,jndiXml.getXML());
             }
         };
         webapp.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",".*/[^/]*servlet-api-[^/]*\\.jar$");
         webapp.setConfigurationClasses(PreconfigureQuickStartWar.__configurationClasses);
         webapp.setContextPath("/");
+        webapp.getMetaData().addDescriptorProcessor(jndiXml);
 
         if (xml != null)
         {
@@ -195,7 +197,7 @@ public class PreconfigureQuickStartWar
         System.exit(1);
     }
 
-    private static void quickstartWebXml(WebAppContext webapp) throws IOException
+    private static void quickstartWebXml(WebAppContext webapp,String extraXML) throws IOException
     {
         webapp.getMetaData().getOrigins();
         // webapp.dumpStdErr();
@@ -569,6 +571,7 @@ public class PreconfigureQuickStartWar
                     out.close();
                 }
             }
+            
             out.close();
         }
 
@@ -580,7 +583,7 @@ public class PreconfigureQuickStartWar
 
             for (LifeCycleCallback c:tmp)
             {
-                out.open("post-costruct");
+                out.open("post-construct");
                 out.tag("lifecycle-callback-class", c.getTargetClassName());
                 out.tag("lifecycle-callback-method", c.getMethodName());
                 out.close();
@@ -595,6 +598,8 @@ public class PreconfigureQuickStartWar
                 out.close();
             }
         }
+
+        out.literal(extraXML);
         
         out.close();
     }
