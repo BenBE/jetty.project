@@ -20,7 +20,9 @@ package org.eclipse.jetty.webapp;
 
 
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -44,7 +46,7 @@ public class MetaInfConfiguration extends AbstractConfiguration
 {
     private static final Logger LOG = Log.getLogger(MetaInfConfiguration.class);
 
-    public static final String METAINF_TLDS = TagLibConfiguration.TLD_RESOURCES;
+    public static final String METAINF_TLDS = "org.eclipse.jetty.tlds";
     public static final String METAINF_FRAGMENTS = FragmentConfiguration.FRAGMENT_RESOURCES;
     public static final String METAINF_RESOURCES = WebInfConfiguration.RESOURCE_DIRS;
   
@@ -62,30 +64,52 @@ public class MetaInfConfiguration extends AbstractConfiguration
             for (Resource r : jars)
             {
                 URI uri = r.getURI();
-                Resource fragXml = Resource.newResource("jar:"+uri+"!/META-INF/web-fragment.xml");
-                if (fragXml.exists())
+                Resource metaInfDir = Resource.newResource("jar:"+uri+"!/META-INF/");
+                            
+                if (metaInfDir.exists() && metaInfDir.isDirectory())
                 {
-                    //add mapping for resource->fragment
-                    Map<Resource, Resource> fragments = (Map<Resource,Resource>)context.getAttribute(METAINF_FRAGMENTS);
-                    if (fragments == null)
-                    {
-                        fragments = new HashMap<Resource, Resource>();
-                        context.setAttribute(METAINF_FRAGMENTS, fragments);
+                    //check if META-INF/resources exists
+                    Resource resourcesDir = metaInfDir.addPath("/resources");
+                    if (resourcesDir.exists() && resourcesDir.isDirectory())
+                    {  
+                        Set<Resource> dirs = (Set<Resource>)context.getAttribute(METAINF_RESOURCES);
+                        if (dirs == null)
+                        {
+                            dirs = new HashSet<Resource>();
+                            context.setAttribute(METAINF_RESOURCES, dirs);
+                        }
+                        dirs.add(resourcesDir);
                     }
-                    fragments.put(r, fragXml);    
-                }
-                
-                Resource resourcesDir = Resource.newResource("jar:"+uri+"!/META-INF/resources");
-                if (resourcesDir.exists())
-                {
-                    //add resources dir
-                    Set<Resource> dirs = (Set<Resource>)context.getAttribute(METAINF_RESOURCES);
-                    if (dirs == null)
+                    
+                    //check if META-INF/web-fragment.xml exists
+                    Resource webFrag = metaInfDir.addPath("web-fragment.xml");
+                    if (webFrag.exists() && !webFrag.isDirectory())
                     {
-                        dirs = new HashSet<Resource>();
-                        context.setAttribute(METAINF_RESOURCES, dirs);
+                        Map<Resource, Resource> fragments = (Map<Resource,Resource>)context.getAttribute(METAINF_FRAGMENTS);
+                        if (fragments == null)
+                        {
+                            fragments = new HashMap<Resource, Resource>();
+                            context.setAttribute(METAINF_FRAGMENTS, fragments);
+                        }
+                        fragments.put(r, webFrag);    
                     }
-                    dirs.add(resourcesDir);
+                    
+                    //find any *.tld files inside META-INF or subdirs
+                    Collection<Resource> resources = metaInfDir.getAllResources();
+                    for (Resource t:resources)
+                    {
+                        String name = t.toString();
+                        if (name.endsWith(".tld"))
+                        {
+                            Collection<URL> tld_resources=(Collection<URL>)context.getAttribute(METAINF_TLDS);
+                            if (tld_resources == null)
+                            {
+                                tld_resources = new HashSet<URL>();
+                                context.setAttribute(METAINF_TLDS, tld_resources);
+                            }
+                            tld_resources.add(t.getURL());
+                        }
+                    }
                 }
             }
         }

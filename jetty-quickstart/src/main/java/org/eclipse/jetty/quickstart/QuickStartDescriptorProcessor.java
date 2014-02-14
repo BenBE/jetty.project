@@ -18,8 +18,11 @@
 
 package org.eclipse.jetty.quickstart;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -29,8 +32,10 @@ import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
 import org.eclipse.jetty.plus.annotation.ContainerInitializer;
 import org.eclipse.jetty.util.StringUtil;
 import org.eclipse.jetty.util.resource.Resource;
+import org.eclipse.jetty.util.resource.ResourceCollection;
 import org.eclipse.jetty.webapp.Descriptor;
 import org.eclipse.jetty.webapp.IterativeDescriptorProcessor;
+import org.eclipse.jetty.webapp.MetaInfConfiguration;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.xml.XmlParser;
 
@@ -89,7 +94,6 @@ public class QuickStartDescriptorProcessor extends IterativeDescriptorProcessor
         {
             if (value != null && !"".equals(value))
             {
-                // System.err.println("Got container initializer: "+value);
                 visitContainerInitializer(context, new ContainerInitializer(Thread.currentThread().getContextClassLoader(), value));
                 context.removeAttribute(name);
             }
@@ -114,6 +118,29 @@ public class QuickStartDescriptorProcessor extends IterativeDescriptorProcessor
                 context.removeAttribute(name);
             }
             return;
+        }
+        if (name.startsWith(MetaInfConfiguration.METAINF_RESOURCES))
+        {
+            if (value != null && !"".equals(value.trim()))
+            {
+                visitMetaInfResource(context, Resource.newResource(value));              
+                context.removeAttribute(name);
+            }
+            return;
+        }
+        if (name.startsWith(MetaInfConfiguration.METAINF_TLDS))
+        {
+            if (value != null && !"".equals(value.trim()))
+            {
+                Collection<URL> tlds = (Collection<URL>)context.getAttribute(MetaInfConfiguration.METAINF_TLDS);
+                if (tlds == null)
+                {
+                    tlds = new HashSet<URL>();
+                    context.setAttribute(MetaInfConfiguration.METAINF_TLDS, tlds);
+                }
+                tlds.add(Resource.newResource(value).getURL());
+                context.removeAttribute(name);
+            }
         }
     }
     
@@ -141,5 +168,24 @@ public class QuickStartDescriptorProcessor extends IterativeDescriptorProcessor
             context.setAttribute(AnnotationConfiguration.CONTAINER_INITIALIZER_STARTER, starter);
             context.addBean(starter, true);
         }
+    }
+    
+    
+    public void visitMetaInfResource (WebAppContext context, Resource dir)
+    {
+        Collection<Resource> metaInfResources =  (Collection<Resource>)context.getAttribute(MetaInfConfiguration.METAINF_RESOURCES);
+        if (metaInfResources == null)
+        {
+            metaInfResources = new HashSet<Resource>();
+            context.setAttribute(MetaInfConfiguration.METAINF_RESOURCES, metaInfResources);
+        }
+        metaInfResources.add(dir);
+        //also add to base resource of webapp
+        Resource[] collection=new Resource[metaInfResources.size()+1];
+        int i=0;
+        collection[i++]=context.getBaseResource();
+        for (Resource resource : metaInfResources)
+            collection[i++]=resource;
+        context.setBaseResource(new ResourceCollection(collection));
     }
 }
