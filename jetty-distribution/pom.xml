@@ -440,9 +440,9 @@
             </goals>
             <configuration>
               <includeGroupIds>org.eclipse.jetty.orbit,org.glassfish.web, org.glassfish, javax.el, javax.servlet.jsp, org.eclipse.jetty.toolchain</includeGroupIds>
-              <includeArtifactIds>org.eclipse.jdt.core, javax.servlet.jsp-api, javax.servlet.jsp, jetty-jsp-jdt, javax.el-api, javax.el</includeArtifactIds>
+              <includeArtifactIds>org.eclipse.jdt.core, javax.servlet.jsp-api, javax.servlet.jsp, jetty-jsp-jdt, javax.el-api, javax.el, glassfish-jsp</includeArtifactIds>
               <includeTypes>jar</includeTypes>
-              <outputDirectory>${assembly-directory}/lib/jsp</outputDirectory>
+              <outputDirectory>${assembly-directory}/lib/glassfish-jsp</outputDirectory>
             </configuration>
           </execution>
           <execution>

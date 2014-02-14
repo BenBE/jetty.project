@@ -3,14 +3,12 @@
     <groupId>org.eclipse.jetty</groupId>
     <artifactId>jetty-project</artifactId>
     <version>9.1.QS-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>jetty-jsp</artifactId>
-  <name>Jetty :: JSP meta module</name>
+  <artifactId>apache-jsp</artifactId>
+  <name>Jetty :: Apache JSP</name>
   <url>http://www.eclipse.org/jetty</url>
   <packaging>jar</packaging>
-
   <build>
     <plugins>
       <plugin>
@@ -35,23 +33,46 @@
 
   <dependencies>
     <dependency>
-       <groupId>org.eclipse.jetty</groupId>
-       <artifactId>glassfish-jsp</artifactId>
-       <version>${project.version}</version>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-util</artifactId>
+        <version>${project.version}</version>
     </dependency>
-
-    <!-- JSTL Api -->
+    
+    <!-- Schemas -->
     <dependency>
-       <groupId>org.eclipse.jetty.orbit</groupId>
-       <artifactId>javax.servlet.jsp.jstl</artifactId>
+      <groupId>org.eclipse.jetty.toolchain</groupId>
+      <artifactId>jetty-schemas</artifactId>
     </dependency>
 
-    <!-- JSTL Impl -->
+    <!-- servlet api -->
     <dependency>
-       <groupId>org.glassfish.web</groupId>
-       <artifactId>javax.servlet.jsp.jstl</artifactId>
+       <groupId>javax.servlet</groupId>
+       <artifactId>javax.servlet-api</artifactId>
     </dependency>
 
+    <!-- JSP Api -->
+    <dependency>
+      <groupId>javax.servlet.jsp</groupId>
+      <artifactId>javax.servlet.jsp-api</artifactId>
+    </dependency>
+
+    <!-- JSP Impl -->
+    <dependency>
+      <groupId>org.mortbay.jasper</groupId>
+      <artifactId>apache-jasper</artifactId>
+    </dependency>
+
+    <!-- EL API & Impl -->
+    <dependency>
+        <groupId>org.mortbay.jasper</groupId>
+        <artifactId>apache-el</artifactId>
+    </dependency>
+
+
+    <!-- Eclipse Java Compiler (for JSP Compilation) -->
+    <dependency>
+      <groupId>org.eclipse.jetty.orbit</groupId>
+      <artifactId>org.eclipse.jdt.core</artifactId>
+    </dependency>
   </dependencies>
-
 </project>

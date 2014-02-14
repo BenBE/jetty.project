@@ -3,14 +3,12 @@
     <groupId>org.eclipse.jetty</groupId>
     <artifactId>jetty-project</artifactId>
     <version>9.1.QS-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>jetty-jsp</artifactId>
-  <name>Jetty :: JSP meta module</name>
+  <artifactId>glassfish-jsp</artifactId>
+  <name>Jetty :: Glassfish JSP</name>
   <url>http://www.eclipse.org/jetty</url>
   <packaging>jar</packaging>
-
   <build>
     <plugins>
       <plugin>
@@ -34,24 +32,48 @@
   </build>
 
   <dependencies>
+    <!-- Schemas -->
     <dependency>
-       <groupId>org.eclipse.jetty</groupId>
-       <artifactId>glassfish-jsp</artifactId>
-       <version>${project.version}</version>
+      <groupId>org.eclipse.jetty.toolchain</groupId>
+      <artifactId>jetty-schemas</artifactId>
     </dependency>
 
-    <!-- JSTL Api -->
+    <!-- servlet api -->
     <dependency>
-       <groupId>org.eclipse.jetty.orbit</groupId>
-       <artifactId>javax.servlet.jsp.jstl</artifactId>
+       <groupId>javax.servlet</groupId>
+       <artifactId>javax.servlet-api</artifactId>
     </dependency>
 
-    <!-- JSTL Impl -->
+    <!-- JSP Api -->
     <dependency>
-       <groupId>org.glassfish.web</groupId>
-       <artifactId>javax.servlet.jsp.jstl</artifactId>
+      <groupId>javax.servlet.jsp</groupId>
+      <artifactId>javax.servlet.jsp-api</artifactId>
+    </dependency>
+    <!-- JSP Impl -->
+    <dependency>
+      <groupId>org.glassfish.web</groupId>
+      <artifactId>javax.servlet.jsp</artifactId>
     </dependency>
 
+    <!-- EL Api -->
+    <!-- Not needed as glassfish impl jars contain also the api classes
+    <dependency>
+      <groupId>javax.el</groupId>
+      <artifactId>javax.el-api</artifactId>
+    </dependency>
+    -->
+
+    <!-- EL Impl -->
+    <dependency>
+        <groupId>org.glassfish</groupId>
+        <artifactId>javax.el</artifactId>
+    </dependency>
+
+
+    <!-- Eclipse Java Compiler (for JSP Compilation) -->
+    <dependency>
+      <groupId>org.eclipse.jetty.orbit</groupId>
+      <artifactId>org.eclipse.jdt.core</artifactId>
+    </dependency>
   </dependencies>
-
 </project>
