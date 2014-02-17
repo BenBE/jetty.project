@@ -424,9 +424,9 @@
     <module>jetty-plus</module>
     <module>jetty-annotations</module>
     <module>jetty-jndi</module>
-    <module>glassfish-jsp</module>
     <module>apache-jsp</module>
-    <module>jetty-jsp</module>
+    <module>glassfish-jsp</module>
+    <module>glassfish-jstl</module>
     <module>jetty-jaas</module>
     <module>jetty-spring</module>
     <module>jetty-client</module>

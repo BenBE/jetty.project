@@ -6,8 +6,8 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>jetty-jsp</artifactId>
-  <name>Jetty :: JSP meta module</name>
+  <artifactId>glassfish-jstl</artifactId>
+  <name>Glassfish :: JSTL module</name>
   <url>http://www.eclipse.org/jetty</url>
   <packaging>jar</packaging>
 
@@ -34,12 +34,6 @@
   </build>
 
   <dependencies>
-    <dependency>
-       <groupId>org.eclipse.jetty</groupId>
-       <artifactId>apache-jsp</artifactId>
-       <version>${project.version}</version>
-    </dependency>
-
     <!-- JSTL Api -->
     <dependency>
        <groupId>org.eclipse.jetty.orbit</groupId>
@@ -51,7 +45,6 @@
        <groupId>org.glassfish.web</groupId>
        <artifactId>javax.servlet.jsp.jstl</artifactId>
     </dependency>
-
   </dependencies>
 
 </project>

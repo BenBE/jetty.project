@@ -18,7 +18,7 @@
         </Set>
         <Call name="setContextAttribute">
           <Arg>org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern</Arg>
-          <Arg>.*/servlet-api-[^/]*\.jar$|.*/javax.servlet.jsp.jstl-[^/]*\.jar$|.*/org.eclipse.jetty.orbit.javax.servlet.jsp.jstl-[^/]*\.jar</Arg>
+          <Arg>.*/servlet-api-[^/]*\.jar$|.*javax.servlet.jsp.jstl-[^/]*\.jar</Arg>
         </Call>
 
         <!-- Add a customize step to the deployment lifecycle -->

@@ -15,6 +15,7 @@
 //  You may elect to redistribute this code under either of these licenses.
 //  ========================================================================
 //
+
 package org.mortbay.apache.jsp;
 
 import java.net.URL;
