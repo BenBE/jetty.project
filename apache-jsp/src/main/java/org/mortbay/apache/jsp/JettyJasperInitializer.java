@@ -46,9 +46,7 @@ public class JettyJasperInitializer extends JasperInitializer
         Collection<URL> tldUrls = (Collection<URL>)context.getAttribute("org.eclipse.jetty.tlds");
         if (tldUrls != null && !tldUrls.isEmpty())
         {
-System.err.println("Set org.eclipse.jetty.tlds to "+tldUrls.size());
             scanner.setJarTldURLs(tldUrls);
-System.err.println("After call to scan");
         }
         return scanner;
     }
