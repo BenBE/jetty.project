@@ -3,7 +3,7 @@
 #
 
 [depend]
-glassfish-jsp
+apache-jsp
 
 [lib]
 lib/jsp/*.jar

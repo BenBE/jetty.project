@@ -1,4 +1,4 @@
-package org.mortbay.apache.jsp;
+//
 //  ========================================================================
 //  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
@@ -16,13 +16,8 @@ package org.mortbay.apache.jsp;
 //  ========================================================================
 //
 
+package org.mortbay.apache.jsp;
 
-
-
-/**
- * 
- */
-// TODO Move to jetty project
 public class JuliLog implements org.apache.juli.logging.Log 
 {
     public static org.apache.juli.logging.Log getInstance(String name)

@@ -433,7 +433,20 @@
             </configuration>
           </execution>
           <execution>
-            <id>copy-jsp-deps</id>
+            <id>copy-apache-jsp-deps</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <includeGroupIds>org.eclipse.jetty,org.eclipse.jetty.toolchain,javax.servlet.jsp,org.mortbay.jasper,org.mortbay.jasper,org.eclipse.jetty.orbit</includeGroupIds>
+              <includeArtifactIds>apache-jsp,jetty-schemas,javax.servlet.jsp-api,apache-jasper,apache-el,org.eclipse.jdt.core</includeArtifactIds>
+              <includeTypes>jar</includeTypes>
+              <outputDirectory>${assembly-directory}/lib/apache-jsp</outputDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-glassfish-jsp-deps</id>
             <phase>generate-resources</phase>
             <goals>
               <goal>copy-dependencies</goal>

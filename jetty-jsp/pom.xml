@@ -36,7 +36,7 @@
   <dependencies>
     <dependency>
        <groupId>org.eclipse.jetty</groupId>
-       <artifactId>glassfish-jsp</artifactId>
+       <artifactId>apache-jsp</artifactId>
        <version>${project.version}</version>
     </dependency>
 
