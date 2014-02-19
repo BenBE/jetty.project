@@ -16,7 +16,7 @@
 //  ========================================================================
 //
 
-package org.mortbay.apache.jsp;
+package org.eclipse.jetty.apache.jsp;
 
 import java.net.URL;
 import java.util.Collection;

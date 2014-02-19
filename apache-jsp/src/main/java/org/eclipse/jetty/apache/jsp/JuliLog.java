@@ -16,22 +16,28 @@
 //  ========================================================================
 //
 
-package org.mortbay.apache.jsp;
+package org.eclipse.jetty.apache.jsp;
 
 public class JuliLog implements org.apache.juli.logging.Log 
 {
     public static org.apache.juli.logging.Log getInstance(String name)
     {
-        return new JuliLog(org.eclipse.jetty.util.log.Log.getLogger(name));
+        return new JuliLog(name);
     }
     
     private final org.eclipse.jetty.util.log.Logger _logger;
     private final org.eclipse.jetty.util.log.StdErrLog _stdErrLog;
+
+    public JuliLog()
+    {    
+        _logger=org.eclipse.jetty.util.log.Log.getRootLogger();
+        _stdErrLog=(_logger instanceof org.eclipse.jetty.util.log.StdErrLog) ? (org.eclipse.jetty.util.log.StdErrLog)_logger:null;
+    }
     
-    public JuliLog(org.eclipse.jetty.util.log.Logger logger)
+    public JuliLog(String name)
     {
-        _logger=logger;
-        _stdErrLog=(logger instanceof org.eclipse.jetty.util.log.StdErrLog) ? (org.eclipse.jetty.util.log.StdErrLog)logger:null;
+        _logger=org.eclipse.jetty.util.log.Log.getLogger(name);
+        _stdErrLog=(_logger instanceof org.eclipse.jetty.util.log.StdErrLog) ? (org.eclipse.jetty.util.log.StdErrLog)_logger:null;
     }
     
     @Override
