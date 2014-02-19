@@ -302,7 +302,7 @@
             <configuration>
               <includeGroupIds>org.eclipse.jetty</includeGroupIds>
               <excludeGroupIds>org.eclipse.jetty.orbit,org.eclipse.jetty.spdy,org.eclipse.jetty.websocket,org.eclipse.jetty.toolchain</excludeGroupIds>
-              <excludeArtifactIds>jetty-all,apache-jsp,jetty-start,jetty-monitor</excludeArtifactIds>
+              <excludeArtifactIds>jetty-all,apache-jsp,jetty-start,jetty-monitor,glassfish-jstl,glassfish-jsp</excludeArtifactIds>
               <includeTypes>jar</includeTypes>
               <outputDirectory>${assembly-directory}/lib</outputDirectory>
             </configuration>
@@ -440,7 +440,7 @@
             </goals>
             <configuration>
               <includeGroupIds>org.eclipse.jetty,org.eclipse.jetty.toolchain,javax.servlet.jsp,org.mortbay.jasper,org.mortbay.jasper,org.eclipse.jetty.orbit</includeGroupIds>
-              <includeArtifactIds>apache-jsp,jetty-schemas,javax.servlet.jsp-api,apache-jasper,apache-el,org.eclipse.jdt.core</includeArtifactIds>
+              <includeArtifactIds>apache-jsp,jetty-schemas,javax.servlet.jsp-api,apache-el,org.eclipse.jdt.core</includeArtifactIds>
               <includeTypes>jar</includeTypes>
               <prependGroupId>true</prependGroupId>
               <outputDirectory>${assembly-directory}/lib/apache-jsp</outputDirectory>

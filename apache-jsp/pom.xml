@@ -59,7 +59,7 @@
     <!-- JSP Impl -->
     <dependency>
       <groupId>org.mortbay.jasper</groupId>
-      <artifactId>apache-jasper</artifactId>
+      <artifactId>apache-jsp</artifactId>
     </dependency>
 
     <!-- EL API & Impl -->
