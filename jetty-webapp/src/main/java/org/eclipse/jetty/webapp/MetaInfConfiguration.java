@@ -55,21 +55,25 @@ public class MetaInfConfiguration extends AbstractConfiguration
     private static final Logger LOG = Log.getLogger(MetaInfConfiguration.class);
 
     public static final String USE_CONTAINER_METAINF_CACHE = "org.eclipse.jetty.metainf.useCache";
+    public static final boolean DEFAULT_USE_CONTAINER_METAINF_CACHE = true;
     public static final String CACHED_CONTAINER_TLDS = "org.eclipse.jetty.tlds.cache";
     public static final String CACHED_CONTAINER_FRAGMENTS = FragmentConfiguration.FRAGMENT_RESOURCES+".cache";
     public static final String CACHED_CONTAINER_RESOURCES = WebInfConfiguration.RESOURCE_DIRS+".cache";
     public static final String METAINF_TLDS = "org.eclipse.jetty.tlds";
     public static final String METAINF_FRAGMENTS = FragmentConfiguration.FRAGMENT_RESOURCES;
     public static final String METAINF_RESOURCES = WebInfConfiguration.RESOURCE_DIRS;
-  
+
     @Override
     public void preConfigure(final WebAppContext context) throws Exception
     {        
-       Boolean attr = (Boolean)context.getServer().getAttribute(USE_CONTAINER_METAINF_CACHE);
-       boolean useContainerCache = (attr != null && attr.booleanValue());
-       if (LOG.isDebugEnabled()) LOG.debug("{} = {}", USE_CONTAINER_METAINF_CACHE, useContainerCache);
-       scanJars(context, context.getMetaData().getContainerResources(), useContainerCache);
-       scanJars(context, context.getMetaData().getWebInfJars(), false);
+        boolean useContainerCache = DEFAULT_USE_CONTAINER_METAINF_CACHE;
+        Boolean attr = (Boolean)context.getServer().getAttribute(USE_CONTAINER_METAINF_CACHE);
+        if (attr != null)
+            useContainerCache = attr.booleanValue();
+        
+        if (LOG.isDebugEnabled()) LOG.debug("{} = {}", USE_CONTAINER_METAINF_CACHE, useContainerCache);
+        scanJars(context, context.getMetaData().getContainerResources(), useContainerCache);
+        scanJars(context, context.getMetaData().getWebInfJars(), false);
     }
 
     /**
