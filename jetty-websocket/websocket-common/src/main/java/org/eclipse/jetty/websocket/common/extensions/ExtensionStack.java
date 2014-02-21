@@ -31,6 +31,7 @@ import org.eclipse.jetty.util.annotation.ManagedObject;
 import org.eclipse.jetty.util.component.ContainerLifeCycle;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
+import org.eclipse.jetty.websocket.api.BatchMode;
 import org.eclipse.jetty.websocket.api.WebSocketPolicy;
 import org.eclipse.jetty.websocket.api.WriteCallback;
 import org.eclipse.jetty.websocket.api.extensions.Extension;
@@ -109,13 +110,13 @@ public class ExtensionStack extends ContainerLifeCycle implements IncomingFrames
         IncomingFrames websocket = getLastIncoming();
         OutgoingFrames network = getLastOutgoing();
 
-        out.append(indent).append(" +- Stack\n");
-        out.append(indent).append("    +- Network  : ").append(network.toString()).append('\n');
+        out.append(indent).append(" +- Stack").append(System.lineSeparator());
+        out.append(indent).append("     +- Network  : ").append(network.toString()).append(System.lineSeparator());
         for (Extension ext : extensions)
         {
-            out.append(indent).append("    +- Extension: ").append(ext.toString()).append('\n');
+            out.append(indent).append("     +- Extension: ").append(ext.toString()).append(System.lineSeparator());
         }
-        out.append(indent).append("    +- Websocket: ").append(websocket.toString()).append('\n');
+        out.append(indent).append("     +- Websocket: ").append(websocket.toString()).append(System.lineSeparator());
     }
 
     @ManagedAttribute(name = "Extension List", readonly = true)
@@ -273,9 +274,9 @@ public class ExtensionStack extends ContainerLifeCycle implements IncomingFrames
     }
 
     @Override
-    public void outgoingFrame(Frame frame, WriteCallback callback)
+    public void outgoingFrame(Frame frame, WriteCallback callback, BatchMode batchMode)
     {
-        FrameEntry entry = new FrameEntry(frame, callback);
+        FrameEntry entry = new FrameEntry(frame, callback, batchMode);
         LOG.debug("Queuing {}", entry);
         entries.offer(entry);
         flusher.iterate();
@@ -307,7 +308,8 @@ public class ExtensionStack extends ContainerLifeCycle implements IncomingFrames
     {
         StringBuilder s = new StringBuilder();
         s.append("ExtensionStack[");
-        s.append("extensions=");
+        s.append("queueSize=").append(entries.size());
+        s.append(",extensions=");
         if (extensions == null)
         {
             s.append("<null>");
@@ -344,11 +346,13 @@ public class ExtensionStack extends ContainerLifeCycle implements IncomingFrames
     {
         private final Frame frame;
         private final WriteCallback callback;
+        private final BatchMode batchMode;
 
-        private FrameEntry(Frame frame, WriteCallback callback)
+        private FrameEntry(Frame frame, WriteCallback callback, BatchMode batchMode)
         {
             this.frame = frame;
             this.callback = callback;
+            this.batchMode = batchMode;
         }
 
         @Override
@@ -369,7 +373,7 @@ public class ExtensionStack extends ContainerLifeCycle implements IncomingFrames
             LOG.debug("Processing {}", current);
             if (current == null)
                 return Action.IDLE;
-            nextOutgoing.outgoingFrame(current.frame, this);
+            nextOutgoing.outgoingFrame(current.frame, this, current.batchMode);
             return Action.SCHEDULED;
         }
 

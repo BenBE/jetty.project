@@ -26,6 +26,7 @@ import org.eclipse.jetty.util.ConcurrentArrayQueue;
 import org.eclipse.jetty.util.IteratingCallback;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
+import org.eclipse.jetty.websocket.api.BatchMode;
 import org.eclipse.jetty.websocket.api.WriteCallback;
 import org.eclipse.jetty.websocket.api.extensions.ExtensionConfig;
 import org.eclipse.jetty.websocket.api.extensions.Frame;
@@ -57,17 +58,17 @@ public class FragmentExtension extends AbstractExtension
     }
 
     @Override
-    public void outgoingFrame(Frame frame, WriteCallback callback)
+    public void outgoingFrame(Frame frame, WriteCallback callback, BatchMode batchMode)
     {
         ByteBuffer payload = frame.getPayload();
         int length = payload != null ? payload.remaining() : 0;
         if (OpCode.isControlFrame(frame.getOpCode()) || maxLength <= 0 || length <= maxLength)
         {
-            nextOutgoingFrame(frame, callback);
+            nextOutgoingFrame(frame, callback, batchMode);
             return;
         }
 
-        FrameEntry entry = new FrameEntry(frame, callback);
+        FrameEntry entry = new FrameEntry(frame, callback, batchMode);
         LOG.debug("Queuing {}", entry);
         entries.offer(entry);
         flusher.iterate();
@@ -84,11 +85,13 @@ public class FragmentExtension extends AbstractExtension
     {
         private final Frame frame;
         private final WriteCallback callback;
+        private final BatchMode batchMode;
 
-        private FrameEntry(Frame frame, WriteCallback callback)
+        private FrameEntry(Frame frame, WriteCallback callback, BatchMode batchMode)
         {
             this.frame = frame;
             this.callback = callback;
+            this.batchMode = batchMode;
         }
 
         @Override
@@ -143,7 +146,7 @@ public class FragmentExtension extends AbstractExtension
             LOG.debug("Fragmented {}->{}", frame, fragment);
             payload.position(newLimit);
 
-            nextOutgoingFrame(fragment, this);
+            nextOutgoingFrame(fragment, this, entry.batchMode);
         }
 
         @Override

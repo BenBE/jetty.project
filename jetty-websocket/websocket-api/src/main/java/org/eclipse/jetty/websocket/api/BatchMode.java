@@ -16,23 +16,35 @@
 //  ========================================================================
 //
 
-package org.eclipse.jetty.websocket.api.extensions;
+package org.eclipse.jetty.websocket.api;
+
+import org.eclipse.jetty.websocket.api.extensions.Frame;
+import org.eclipse.jetty.websocket.api.extensions.OutgoingFrames;
 
 /**
- * Interface for dealing with Incoming Frames.
+ * The possible batch modes when invoking {@link OutgoingFrames#outgoingFrame(Frame, WriteCallback, BatchMode)}.
  */
-public interface IncomingFrames
+public enum BatchMode
 {
-    public void incomingError(Throwable t);
+    /**
+     * Implementers are free to decide whether to send or not frames
+     * to the network layer.
+     */
+    AUTO,
 
     /**
-     * Process the incoming frame.
-     * <p>
-     * Note: if you need to hang onto any information from the frame, be sure
-     * to copy it, as the information contained in the Frame will be released
-     * and/or reused by the implementation.
-     * 
-     * @param frame the frame to process
+     * Implementers must batch frames.
      */
-    public void incomingFrame(Frame frame);
+    ON,
+
+    /**
+     * Implementers must send frames to the network layer.
+     */
+    OFF;
+
+    public static BatchMode max(BatchMode one, BatchMode two)
+    {
+        // Return the BatchMode that has the higher priority, where AUTO < ON < OFF.
+        return one.ordinal() < two.ordinal() ? two : one;
+    }
 }
