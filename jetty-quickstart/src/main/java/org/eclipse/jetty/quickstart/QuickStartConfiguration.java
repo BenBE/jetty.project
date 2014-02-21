@@ -18,6 +18,8 @@
 
 package org.eclipse.jetty.quickstart;
 
+import javax.servlet.ServletContext;
+
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.annotations.AnnotationDecorator;
 import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
@@ -28,6 +30,7 @@ import org.eclipse.jetty.webapp.AbstractConfiguration;
 import org.eclipse.jetty.webapp.StandardDescriptorProcessor;
 import org.eclipse.jetty.webapp.WebAppClassLoader;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.webapp.WebInfConfiguration;
 
 /**
  * QuickStartConfiguration
@@ -36,7 +39,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
  * which combines all pre-parsed web xml descriptors and annotations.
  * 
  */
-public class QuickStartConfiguration extends AbstractConfiguration
+public class QuickStartConfiguration extends WebInfConfiguration
 {
     private static final Logger LOG = Log.getLogger(QuickStartConfiguration.class);
 
@@ -50,7 +53,10 @@ public class QuickStartConfiguration extends AbstractConfiguration
         String war = context.getWar();
         if (war == null || war.length()<=0)
             throw new IllegalStateException ("No location for webapp");  
-      
+        
+        //Make a temp directory for the webapp if one is not already set
+        resolveTempDirectory(context);
+
         Resource webApp = context.newResource(war);
 
         // Accept aliases for WAR files
@@ -128,8 +134,7 @@ public class QuickStartConfiguration extends AbstractConfiguration
             throw new IllegalStateException("ServletContainerInitializersStarter already exists");
         starter = new ServletContainerInitializersStarter(context);
         context.setAttribute(AnnotationConfiguration.CONTAINER_INITIALIZER_STARTER, starter);
-        context.addBean(starter, true); 
-        
+        context.addBean(starter, true);       
 
         LOG.debug("configured {}",this);
     }

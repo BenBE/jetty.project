@@ -166,7 +166,7 @@ public class PreconfigureQuickStartWar
                 quickstartWebXml(this,literalXml.getXML());
             }
         };
-        webapp.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",".*/[^/]*servlet-api-[^/]*\\.jar$");
+        webapp.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",".*/[^/]*servlet-api-[^/]*\\.jar$|.*/[^/]*jstl[^/]*\\.jar");
         webapp.setConfigurationClasses(PreconfigureQuickStartWar.__configurationClasses);
         webapp.setContextPath("/");
         webapp.getMetaData().addDescriptorProcessor(literalXml);
@@ -646,10 +646,14 @@ public class PreconfigureQuickStartWar
         out.tag(tag + "-class",origin(md,ot + tag + "-class"),holder.getClassName());
 
         for (String p : holder.getInitParameters().keySet())
+        {
+            if ("scratchdir".equalsIgnoreCase(p)) //don't preconfigure the temp dir for jsp output
+                continue;
             out.open("init-param",origin(md,ot + "init-param." + p))
             .tag("param-name",p)
             .tag("param-value",holder.getInitParameter(p))
             .close();
+        }
 
         if (holder instanceof ServletHolder)
         {
