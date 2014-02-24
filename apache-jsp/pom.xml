@@ -62,13 +62,6 @@
       <artifactId>apache-jsp</artifactId>
     </dependency>
 
-    <!-- EL API & Impl -->
-    <dependency>
-        <groupId>org.mortbay.jasper</groupId>
-        <artifactId>apache-el</artifactId>
-    </dependency>
-
-
     <!-- Eclipse Java Compiler (for JSP Compilation) -->
     <dependency>
       <groupId>org.eclipse.jetty.orbit</groupId>
