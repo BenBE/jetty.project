@@ -24,6 +24,7 @@ import java.util.Collection;
 import javax.servlet.ServletContext;
 
 import org.apache.jasper.servlet.JasperInitializer;
+import org.apache.jasper.servlet.TldPreScanned;
 import org.apache.jasper.servlet.TldScanner;
 
 /**
@@ -40,15 +41,14 @@ public class JettyJasperInitializer extends JasperInitializer
      * @see org.apache.jasper.servlet.JasperInitializer#prepareScanner(javax.servlet.ServletContext, boolean, boolean, boolean)
      */
     @Override
-    public TldScanner prepareScanner(ServletContext context, boolean namespaceAware, boolean validate, boolean blockExternal)
-    {
-        TldScanner scanner = super.prepareScanner(context, namespaceAware, validate, blockExternal);
+    public TldScanner newTldScanner(ServletContext context, boolean namespaceAware, boolean validate, boolean blockExternal)
+    {        
         Collection<URL> tldUrls = (Collection<URL>)context.getAttribute("org.eclipse.jetty.tlds");
         if (tldUrls != null && !tldUrls.isEmpty())
         {
-            scanner.setJarTldURLs(tldUrls);
+            return new TldPreScanned(context,namespaceAware,validate,blockExternal,tldUrls);
         }
-        return scanner;
+        return super.newTldScanner(context, namespaceAware, validate, blockExternal);
     }
     
 
