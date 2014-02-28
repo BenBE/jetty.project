@@ -447,7 +447,7 @@ public class AnnotationConfiguration extends AbstractConfiguration
        {
            Map<String, Set<String>> map = ( Map<String, Set<String>>) context.getAttribute(AnnotationConfiguration.CLASS_INHERITANCE_MAP);
            if (map == null)
-               throw new IllegalStateException ("No class hierarchy");
+               LOG.warn ("ServletContainerInitializers: detected. Class hierarchy: empty");
            for (ContainerInitializer i : initializers)
         	   i.resolveClasses(context,map);
        }
