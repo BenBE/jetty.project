@@ -19,12 +19,9 @@
 package org.eclipse.jetty.quickstart;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EventListener;
@@ -35,7 +32,6 @@ import java.util.Set;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.MultipartConfigElement;
-import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
@@ -43,7 +39,6 @@ import javax.servlet.descriptor.JspPropertyGroupDescriptor;
 import javax.servlet.descriptor.TaglibDescriptor;
 
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
-import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
 import org.eclipse.jetty.http.MimeTypes;
 import org.eclipse.jetty.plus.annotation.ContainerInitializer;
 import org.eclipse.jetty.plus.annotation.LifeCycleCallback;
@@ -58,24 +53,25 @@ import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.FilterMapping;
 import org.eclipse.jetty.servlet.Holder;
 import org.eclipse.jetty.servlet.ServletContextHandler.JspConfig;
-import org.eclipse.jetty.servlet.ServletContextHandler.JspPropertyGroup;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlet.ServletMapping;
+import org.eclipse.jetty.util.log.Log;
+import org.eclipse.jetty.util.log.Logger;
 import org.eclipse.jetty.util.resource.JarResource;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.webapp.MetaData;
 import org.eclipse.jetty.webapp.MetaData.OriginInfo;
 import org.eclipse.jetty.webapp.MetaInfConfiguration;
-import org.eclipse.jetty.webapp.Origin;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.xml.XmlAppendable;
 import org.eclipse.jetty.xml.XmlConfiguration;
 
 public class PreconfigureQuickStartWar
 {
-    static final boolean ORIGIN=true;
+    private static final Logger LOG = Log.getLogger(PreconfigureQuickStartWar.class);
+    static final boolean ORIGIN=LOG.isDebugEnabled();
     
     public static final String[] __configurationClasses = new String[]
     { 

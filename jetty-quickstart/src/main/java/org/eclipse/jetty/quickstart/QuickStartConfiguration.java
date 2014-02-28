@@ -18,15 +18,12 @@
 
 package org.eclipse.jetty.quickstart;
 
-import javax.servlet.ServletContext;
-
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.annotations.AnnotationDecorator;
 import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 import org.eclipse.jetty.util.resource.Resource;
-import org.eclipse.jetty.webapp.AbstractConfiguration;
 import org.eclipse.jetty.webapp.StandardDescriptorProcessor;
 import org.eclipse.jetty.webapp.WebAppClassLoader;
 import org.eclipse.jetty.webapp.WebAppContext;
