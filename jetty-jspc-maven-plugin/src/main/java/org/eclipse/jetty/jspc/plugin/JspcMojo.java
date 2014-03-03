@@ -79,6 +79,7 @@ import org.eclipse.jetty.util.resource.Resource;
 public class JspcMojo extends AbstractMojo
 {
     public static final String END_OF_WEBAPP = "</web-app>";
+    public static final String PRECOMPILED_FLAG = "org.eclipse.jetty.jsp.precompiled";
 
 
     /**
@@ -419,6 +420,10 @@ public class JspcMojo extends AbstractMojo
                         mergedWebXmlWriter.println(line);
                     }
                 }
+                
+                //put in a context init-param to flag that the contents have been precompiled
+                mergedWebXmlWriter.println("<context-param><param-name>"+PRECOMPILED_FLAG+"</param-name><param-value>true</param-value></context-param>");
+                
 
                 // put in the generated fragment
                 try (BufferedReader fragmentWebXmlReader = new BufferedReader(

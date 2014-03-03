@@ -18,14 +18,20 @@
 
 package org.eclipse.jetty.apache.jsp;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 
 import org.apache.jasper.servlet.JasperInitializer;
 import org.apache.jasper.servlet.TldPreScanned;
 import org.apache.jasper.servlet.TldScanner;
+import org.xml.sax.SAXException;
 
 /**
  * JettyJasperInitializer
@@ -33,6 +39,53 @@ import org.apache.jasper.servlet.TldScanner;
  */
 public class JettyJasperInitializer extends JasperInitializer
 {
+    
+    /**
+     * NullTldScanner
+     *
+     * Does nothing. Used when we can tell that all jsps have been precompiled, in which case
+     * the tlds are not needed.
+     */
+    private final class NullTldScanner extends TldScanner
+    {
+        /**
+         * @param context
+         * @param namespaceAware
+         * @param validation
+         * @param blockExternal
+         */
+        private NullTldScanner(ServletContext context, boolean namespaceAware, boolean validation, boolean blockExternal)
+        {
+            super(context, namespaceAware, validation, blockExternal);
+        }
+
+        /**
+         * @see org.apache.jasper.servlet.TldScanner#scan()
+         */
+        @Override
+        public void scan() throws IOException, SAXException
+        {
+            return; //do nothing
+        }
+
+        /**
+         * @see org.apache.jasper.servlet.TldScanner#getListeners()
+         */
+        @Override
+        public List<String> getListeners()
+        {
+            return Collections.emptyList();
+        }
+
+        /**
+         * @see org.apache.jasper.servlet.TldScanner#scanJars()
+         */
+        @Override
+        public void scanJars()
+        {
+           return; //do nothing
+        }
+    }
 
     /**
      * Make a TldScanner, and prefeed it the tlds that have already been discovered in jar files
@@ -42,7 +95,13 @@ public class JettyJasperInitializer extends JasperInitializer
      */
     @Override
     public TldScanner newTldScanner(ServletContext context, boolean namespaceAware, boolean validate, boolean blockExternal)
-    {        
+    {  
+        String tmp = context.getInitParameter("org.eclipse.jetty.jsp.precompiled");
+        if (tmp!=null && !tmp.equals("") && Boolean.valueOf(tmp))
+        {
+            return new NullTldScanner(context, namespaceAware, validate, blockExternal);
+        }
+        
         Collection<URL> tldUrls = (Collection<URL>)context.getAttribute("org.eclipse.jetty.tlds");
         if (tldUrls != null && !tldUrls.isEmpty())
         {
