@@ -34,6 +34,10 @@ public class OneWebApp
         // or programmatically obtain it for use in test cases.
         Server server = new Server(8080);
         
+        org.eclipse.jetty.webapp.Configuration.ClassList classlist = org.eclipse.jetty.webapp.Configuration.ClassList.setServerDefault(server);
+        classlist.addAfter("org.eclipse.jetty.webapp.FragmentConfiguration", "org.eclipse.jetty.plus.webapp.EnvConfiguration", "org.eclipse.jetty.plus.webapp.PlusConfiguration");
+        classlist.addBefore("org.eclipse.jetty.webapp.JettyWebXmlConfiguration", "org.eclipse.jetty.annotations.AnnotationConfiguration");
+
         // Setup JMX
         MBeanContainer mbContainer=new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
         server.addBean(mbContainer);
@@ -45,7 +49,7 @@ public class OneWebApp
         // PlusConfiguration) to choosing where the webapp will unpack itself.
         WebAppContext webapp = new WebAppContext();
         webapp.setContextPath("/");
-        webapp.setWar("../../jetty-distribution/target/distribution/demo-base/webapps/test.war");
+        webapp.setWar("../../tests/test-webapps/test-jetty-webapp/target/test-jetty-webapp-9.1.QS-SNAPSHOT.war");
 
         // A WebAppContext is a ContextHandler as well so it needs to be set to the server so it is aware of where to
         // send the appropriate requests.

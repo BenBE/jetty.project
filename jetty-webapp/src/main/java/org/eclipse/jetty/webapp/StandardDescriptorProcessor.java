@@ -319,12 +319,7 @@ public class StandardDescriptorProcessor extends IterativeDescriptorProcessor
         // Handle JSP file
         String jsp_file = node.getString("jsp-file", false, true);
         if (jsp_file != null)
-        {
             holder.setForcedPath(jsp_file);
-            ServletHolder jsp=context.getServletHandler().getServlet("jsp");
-            if (jsp!=null)
-                holder.setClassName(jsp.getClassName());
-        }
 
         // handle load-on-startup
         XmlParser.Node startup = node.get("load-on-startup");

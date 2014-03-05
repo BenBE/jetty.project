@@ -86,5 +86,17 @@
       <artifactId>jetty-test-helper</artifactId>
       <!-- scope>test</scope-->
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>apache-jsp</artifactId>
+      <version>${project.version}</version>
+      <scope>provide</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>glassfish-jstl</artifactId>
+      <version>${project.version}</version>
+      <scope>provide</scope>
+    </dependency>
   </dependencies>
 </project>
