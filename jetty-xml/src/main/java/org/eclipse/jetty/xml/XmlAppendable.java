@@ -123,6 +123,14 @@ public class XmlAppendable
         return this;
     }
     
+    public XmlAppendable tagCDATA(String tag,String data) throws IOException
+    {
+        _out.append(_space).append('<').append(tag).append('>');
+        cdata(data);
+        _out.append("</").append(tag).append(">\n");
+        return this;
+    }
+    
     public XmlAppendable tag(String tag, Map<String,String> attributes,String content) throws IOException
     {
         _out.append(_space).append('<').append(tag);

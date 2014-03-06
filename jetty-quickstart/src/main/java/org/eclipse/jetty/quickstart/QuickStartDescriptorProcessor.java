@@ -30,7 +30,9 @@ import javax.servlet.ServletContext;
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
 import org.eclipse.jetty.plus.annotation.ContainerInitializer;
+import org.eclipse.jetty.util.QuotedStringTokenizer;
 import org.eclipse.jetty.util.StringUtil;
+import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.resource.ResourceCollection;
 import org.eclipse.jetty.webapp.Descriptor;
@@ -46,7 +48,7 @@ import org.eclipse.jetty.xml.XmlParser;
  */
 public class QuickStartDescriptorProcessor extends IterativeDescriptorProcessor
 {
-    public static final String CONTAINER_INITIALIZER_ID = "org.eclipse.jetty.containerInitializers";
+    private String _resourceBase;
 
     /**
      * 
@@ -90,57 +92,88 @@ public class QuickStartDescriptorProcessor extends IterativeDescriptorProcessor
     {
         String name = node.getString("param-name", false, true);
         String value = node.getString("param-value", false, true);
-        if (name.startsWith(CONTAINER_INITIALIZER_ID))
+        List<String> values = new ArrayList<>();
+        
+        // extract values
+        switch(name)
         {
-            if (value != null && !"".equals(value))
-            {
-                visitContainerInitializer(context, new ContainerInitializer(Thread.currentThread().getContextClassLoader(), value));
+            case ServletContext.ORDERED_LIBS:
+            case AnnotationConfiguration.CONTAINER_INITIALIZERS:
+            case MetaInfConfiguration.METAINF_TLDS:
+            case MetaInfConfiguration.METAINF_RESOURCES:
+
                 context.removeAttribute(name);
-            }
-            return;
+                
+                QuotedStringTokenizer tok = new QuotedStringTokenizer(value,",");
+                while(tok.hasMoreElements())
+                    values.add(tok.nextToken());
+                
+                break;
+                
+            default:
+                values.add(value);
         }
-        if (name.equalsIgnoreCase(ServletContext.ORDERED_LIBS))
+
+        // handle values
+        switch(name)
         {
-            if (value != null && !"".equals(value.trim()))
+            case ServletContext.ORDERED_LIBS:
             {
-                context.setAttribute(ServletContext.ORDERED_LIBS, Arrays.asList(StringUtil.arrayFromString(value)));
-                context.removeAttribute(name);
+                List<Object> libs = new ArrayList<>();
+                Object o=context.getAttribute(ServletContext.ORDERED_LIBS);
+                if (o instanceof Collection<?>)
+                    libs.addAll((Collection<?>)o);
+                libs.addAll(values);
+                if (libs.size()>0)
+                    context.setAttribute(ServletContext.ORDERED_LIBS,libs);
+                
+                break;
             }
-            return;
-        }
-        if (name.startsWith("org.eclipse.jetty.quickstart.baseResource"))
-        {
-            if (value != null && !"".equals(value.trim()))
+                
+            case AnnotationConfiguration.CONTAINER_INITIALIZERS:
             {
-                Resource baseResource = Resource.newResource(value);
-                if (!context.getBaseResource().equals(baseResource))
-                    throw new IllegalStateException("Persisted baseResource("+value+") != actual baseResource("+context.getBaseResource()+")");
-                context.removeAttribute(name);
+                for (String i : values)
+                    visitContainerInitializer(context, new ContainerInitializer(Thread.currentThread().getContextClassLoader(), i));
+                break;
             }
-            return;
-        }
-        if (name.startsWith(MetaInfConfiguration.METAINF_RESOURCES))
-        {
-            if (value != null && !"".equals(value.trim()))
+            
+            case MetaInfConfiguration.METAINF_TLDS:
             {
-                visitMetaInfResource(context, Resource.newResource(value));              
-                context.removeAttribute(name);
-            }
-            return;
-        }
-        if (name.startsWith(MetaInfConfiguration.METAINF_TLDS))
-        {
-            if (value != null && !"".equals(value.trim()))
-            {
-                Collection<URL> tlds = (Collection<URL>)context.getAttribute(MetaInfConfiguration.METAINF_TLDS);
-                if (tlds == null)
+                List<Object> tlds = new ArrayList<>();
+                String war=context.getBaseResource().getURI().toString();
+                Object o=context.getAttribute(MetaInfConfiguration.METAINF_TLDS);
+                if (o instanceof Collection<?>)
+                    tlds.addAll((Collection<?>)o);
+                for (String i : values)
                 {
-                    tlds = new HashSet<URL>();
-                    context.setAttribute(MetaInfConfiguration.METAINF_TLDS, tlds);
+                    Resource r = Resource.newResource(i.replace("${WAR}/",war));
+                    if (r.exists())
+                        tlds.add(r.getURL());
+                    else
+                        throw new IllegalArgumentException("TLD not found: "+r);                    
                 }
-                tlds.add(Resource.newResource(value).getURL());
-                context.removeAttribute(name);
+                
+                if (tlds.size()>0)
+                    context.setAttribute(MetaInfConfiguration.METAINF_TLDS,tlds);
+                break;
             }
+            
+            case MetaInfConfiguration.METAINF_RESOURCES:
+            {
+                String war=context.getBaseResource().getURI().toString();
+                for (String i : values)
+                {
+                    Resource r = Resource.newResource(i.replace("${WAR}/",war));
+                    if (r.exists())
+                        visitMetaInfResource(context,r); 
+                    else
+                        throw new IllegalArgumentException("Resource not found: "+r);                    
+                }
+                break;
+            }
+                
+            default:
+                
         }
     }
     

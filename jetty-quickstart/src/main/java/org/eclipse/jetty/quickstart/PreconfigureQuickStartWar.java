@@ -56,6 +56,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler.JspConfig;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlet.ServletMapping;
+import org.eclipse.jetty.util.QuotedStringTokenizer;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 import org.eclipse.jetty.util.resource.JarResource;
@@ -200,6 +201,9 @@ public class PreconfigureQuickStartWar
         webapp.getMetaData().getOrigins();
         // webapp.dumpStdErr();
 
+        if (webapp.getBaseResource()==null)
+            throw new IllegalArgumentException("No base resource for "+webapp);
+        
         File webxml = new File(webapp.getWebInf().getFile(),"quickstart-web.xml");
 
         XmlAppendable out = new XmlAppendable(new PrintStream(webxml));
@@ -220,60 +224,19 @@ public class PreconfigureQuickStartWar
         // Set some special context parameters
 
         // The location of the war file on disk
-        out.open("context-param")
-        .tag("param-name","org.eclipse.jetty.quickstart.baseResource")
-        .tag("param-value",webapp.getBaseResource().getFile().getCanonicalFile().getAbsoluteFile().toURI().toString())
-        .close();
-
+        String resourceBase=webapp.getBaseResource().getFile().getCanonicalFile().getAbsoluteFile().toURI().toString();
+        
         // The library order
-        if (webapp.getAttribute(ServletContext.ORDERED_LIBS)!=null)
-            out.open("context-param")
-            .tag("param-name",ServletContext.ORDERED_LIBS)
-            .tag("param-value",webapp.getAttribute(ServletContext.ORDERED_LIBS).toString())
-            .close();
-
+        addContextParamFromAttribute(out,webapp,ServletContext.ORDERED_LIBS);
         //the servlet container initializers
-        List<ContainerInitializer> initializers = (List<ContainerInitializer>)webapp.getAttribute(AnnotationConfiguration.CONTAINER_INITIALIZERS);
-        if (initializers != null && !initializers.isEmpty())
-        {
-            int i = 0;
-            for (ContainerInitializer ci : initializers)
-            {
-                out.open("context-param")
-                .tag("param-name",AnnotationConfiguration.CONTAINER_INITIALIZERS + "." + i++)
-                .tag("param-value",ci.toString())
-                .close();
-            }
-        }
-
+        addContextParamFromAttribute(out,webapp,AnnotationConfiguration.CONTAINER_INITIALIZERS);
         //the tlds discovered
-        Collection<URL> metaInfTlds = (Collection<URL>)webapp.getAttribute(MetaInfConfiguration.METAINF_TLDS);
-        if (metaInfTlds != null && !metaInfTlds.isEmpty())
-        {
-            int i = 0;
-            for (URL tld:metaInfTlds)
-            {
-                out.open("context-param");
-                out.tag("param-name", MetaInfConfiguration.METAINF_TLDS+"."+i++);
-                out.tag("param-value", tld.toString());
-                out.close();
-            }
-        }
-        
+        addContextParamFromAttribute(out,webapp,MetaInfConfiguration.METAINF_TLDS,resourceBase);
         //the META-INF/resources discovered
-        Collection<Resource> resourceDirs = (Collection<Resource>)webapp.getAttribute(MetaInfConfiguration.METAINF_RESOURCES);
-        if (resourceDirs != null && !resourceDirs.isEmpty())
-        {
-            int i = 0;
-            for (Resource d:resourceDirs)
-            {
-                out.open("context-param");
-                out.tag("param-name", MetaInfConfiguration.METAINF_RESOURCES+"."+i++);
-                out.tag("param-value", d.toString());
-                out.close();
-            }
-        }
+        addContextParamFromAttribute(out,webapp,MetaInfConfiguration.METAINF_RESOURCES,resourceBase);
+
         
+        // init params
         for (String p : webapp.getInitParams().keySet())
             out.open("context-param",origin(md,"context-param." + p))
             .tag("param-name",p)
@@ -629,6 +592,37 @@ public class PreconfigureQuickStartWar
         out.literal(extraXML);
         
         out.close();
+    }
+
+    private static void addContextParamFromAttribute(XmlAppendable out, WebAppContext webapp, String attribute) throws IOException
+    {
+        addContextParamFromAttribute(out,webapp,attribute,null);
+    }
+    
+    private static void addContextParamFromAttribute(XmlAppendable out, WebAppContext webapp, String attribute, String resourceBase) throws IOException
+    {
+        Object o=webapp.getAttribute(attribute);
+        if (o==null)
+            return;
+                
+        Collection<?> c =  (o instanceof Collection)? (Collection<?>)o:Collections.singletonList(o);
+        StringBuilder v=new StringBuilder();
+        for (Object i:c)
+        {
+            if (i!=null)
+            {
+                if (v.length()>0)
+                    v.append(',');
+                if (resourceBase==null)
+                    QuotedStringTokenizer.quote(v,i.toString());
+                else
+                    QuotedStringTokenizer.quote(v,i.toString().replace(resourceBase,"${WAR}/"));
+            }
+        }
+        out.open("context-param")
+        .tag("param-name",attribute)
+        .tagCDATA("param-value",v.toString())
+        .close();        
     }
 
     private static void outholder(XmlAppendable out, MetaData md, String tag, Holder<?> holder) throws IOException
