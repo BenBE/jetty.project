@@ -521,7 +521,7 @@
       <dependency>
         <groupId>org.mortbay.jasper</groupId>
         <artifactId>apache-jsp</artifactId>
-        <version>8.0.3-SNAPSHOT</version>
+        <version>8.0.3.v20140307</version>
       </dependency>
 
       <dependency>
