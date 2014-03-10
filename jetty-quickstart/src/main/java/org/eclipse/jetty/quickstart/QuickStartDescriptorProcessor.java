@@ -18,9 +18,7 @@
 
 package org.eclipse.jetty.quickstart;
 
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -31,8 +29,6 @@ import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
 import org.eclipse.jetty.plus.annotation.ContainerInitializer;
 import org.eclipse.jetty.util.QuotedStringTokenizer;
-import org.eclipse.jetty.util.StringUtil;
-import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.resource.ResourceCollection;
 import org.eclipse.jetty.webapp.Descriptor;
@@ -48,8 +44,6 @@ import org.eclipse.jetty.xml.XmlParser;
  */
 public class QuickStartDescriptorProcessor extends IterativeDescriptorProcessor
 {
-    private String _resourceBase;
-
     /**
      * 
      */

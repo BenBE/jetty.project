@@ -19,14 +19,16 @@
 package org.eclipse.jetty.quickstart;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
-import java.net.URL;
+import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EventListener;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,7 +42,6 @@ import javax.servlet.descriptor.TaglibDescriptor;
 
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.http.MimeTypes;
-import org.eclipse.jetty.plus.annotation.ContainerInitializer;
 import org.eclipse.jetty.plus.annotation.LifeCycleCallback;
 import org.eclipse.jetty.plus.annotation.LifeCycleCallbackCollection;
 import org.eclipse.jetty.security.ConstraintAware;
@@ -206,7 +207,7 @@ public class PreconfigureQuickStartWar
         
         File webxml = new File(webapp.getWebInf().getFile(),"quickstart-web.xml");
 
-        XmlAppendable out = new XmlAppendable(new PrintStream(webxml));
+        XmlAppendable out = new XmlAppendable(new FileOutputStream(webxml),"UTF-8");
         MetaData md = webapp.getMetaData();
 
         Map<String, String> webappAttr = new HashMap<>();
