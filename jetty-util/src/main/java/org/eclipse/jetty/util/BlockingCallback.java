@@ -21,8 +21,8 @@ package org.eclipse.jetty.util;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
 /* ------------------------------------------------------------ */
 /**
@@ -53,10 +53,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class BlockingCallback implements Callback
 {
-    private static Throwable COMPLETED=new Throwable();
-    private final AtomicBoolean _done=new AtomicBoolean(false);
-    private final Semaphore _semaphore = new Semaphore(0);
-    private Throwable _cause;
+    private static Throwable SUCCEEDED=new Throwable()
+    {
+        @Override
+        public String toString() { return "SUCCEEDED"; }
+    };
+    
+    private final CountDownLatch _latch = new CountDownLatch(1);
+    private final AtomicReference<Throwable> _state = new AtomicReference<>();
     
     public BlockingCallback()
     {}
@@ -64,21 +68,15 @@ public class BlockingCallback implements Callback
     @Override
     public void succeeded()
     {
-        if (_done.compareAndSet(false,true))
-        {
-            _cause=COMPLETED;
-            _semaphore.release();
-        }
+        if (_state.compareAndSet(null,SUCCEEDED))
+            _latch.countDown();
     }
 
     @Override
     public void failed(Throwable cause)
     {
-        if (_done.compareAndSet(false,true))
-        {
-            _cause=cause;
-            _semaphore.release();
-        }
+        if (_state.compareAndSet(null,cause))
+            _latch.countDown();
     }
 
     /** Block until the Callback has succeeded or failed and 
@@ -91,14 +89,15 @@ public class BlockingCallback implements Callback
     {
         try
         {
-            _semaphore.acquire();
-            if (_cause==COMPLETED)
+            _latch.await();
+            Throwable state=_state.get();
+            if (state==SUCCEEDED)
                 return;
-            if (_cause instanceof IOException)
-                throw (IOException) _cause;
-            if (_cause instanceof CancellationException)
-                throw (CancellationException) _cause;
-            throw new IOException(_cause);
+            if (state instanceof IOException)
+                throw (IOException) state;
+            if (state instanceof CancellationException)
+                throw (CancellationException) state;
+            throw new IOException(state);
         }
         catch (final InterruptedException e)
         {
@@ -106,8 +105,7 @@ public class BlockingCallback implements Callback
         }
         finally
         {
-            _done.set(false);
-            _cause=null;
+            _state.set(null);
         }
     }
     
@@ -115,7 +113,7 @@ public class BlockingCallback implements Callback
     @Override
     public String toString()
     {
-        return String.format("%s@%x{%b,%b}",BlockingCallback.class.getSimpleName(),hashCode(),_done.get(),_cause==COMPLETED);
+        return String.format("%s@%x{%s}",BlockingCallback.class.getSimpleName(),hashCode(),_state.get());
     }
 
 }

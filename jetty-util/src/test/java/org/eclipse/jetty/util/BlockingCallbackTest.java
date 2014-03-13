@@ -32,56 +32,16 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-@RunWith(Parameterized.class)
 public class BlockingCallbackTest
 {
-    private final static BlockingCallback reused= new BlockingCallback();
-    interface Factory
+    public BlockingCallbackTest()
     {
-        BlockingCallback newBlockingCallback();
     }
-    
-    @Parameters
-    public static Collection<Object[]> data() 
-    {
-        List<Object[]> data = new ArrayList<>();
-        data.add(new Factory[] { new Factory() {
-            @Override
-            public BlockingCallback newBlockingCallback()
-            {
-                return new BlockingCallback();
-            }
-        }});
-        data.add(new Factory[] { new Factory() {
-            @Override
-            public BlockingCallback newBlockingCallback()
-            {
-                return reused;
-            }
-        }});
-        data.add(new Factory[] { new Factory() {
-            @Override
-            public BlockingCallback newBlockingCallback()
-            {
-                return reused;
-            }
-        }});
-        
-        return data;
-    }
-    
-    final private Factory _factory;
-    
-    public BlockingCallbackTest(Factory factory)
-    {
-        _factory=factory;
-    }
-    
     
     @Test
     public void testDone() throws Exception
     {
-        BlockingCallback fcb= _factory.newBlockingCallback();
+        final BlockingCallback fcb= new BlockingCallback();
         fcb.succeeded();
         long start=System.currentTimeMillis();
         fcb.block();
@@ -91,7 +51,7 @@ public class BlockingCallbackTest
     @Test
     public void testGetDone() throws Exception
     {
-        final BlockingCallback fcb= _factory.newBlockingCallback();
+        final BlockingCallback fcb= new BlockingCallback();
         final CountDownLatch latch = new CountDownLatch(1);
         
         new Thread(new Runnable()
@@ -115,7 +75,7 @@ public class BlockingCallbackTest
     @Test
     public void testFailed() throws Exception
     {
-        BlockingCallback fcb= _factory.newBlockingCallback();
+        final BlockingCallback fcb= new BlockingCallback();
         Exception ex=new Exception("FAILED");
         fcb.failed(ex);
         
@@ -135,7 +95,7 @@ public class BlockingCallbackTest
     @Test
     public void testGetFailed() throws Exception
     {
-        final BlockingCallback fcb= _factory.newBlockingCallback();
+        final BlockingCallback fcb= new BlockingCallback();
         final Exception ex=new Exception("FAILED");
         final CountDownLatch latch = new CountDownLatch(1);
         
